@@ -1,422 +1,137 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PumpVision AI</title>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1016"><title>PumpVision Turbo — Fast Solana Radar</title>
 <style>
-:root{--bg:#0d0f10;--pn:#16191b;--ln:#262b2f;--tx:#e8ecef;--mu:#8a949c;--gr:#2cff7a;--rd:#ff4d5e;--bl:#3da9ff;--am:#ffb84d}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,sans-serif;font-variant-numeric:tabular-nums}
-header{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--ln);position:sticky;top:0;background:var(--bg);z-index:5}
-.logo{font-size:17px;letter-spacing:.2px}.logo i{color:var(--gr);font-style:normal}
-.pill{padding:3px 10px;border-radius:99px;border:1px solid;font-size:12px}.ok{color:var(--gr)}.warn{color:var(--am)}.bad{color:var(--rd)}
-.mu{color:var(--mu)}.small{font-size:12px}
-main{display:grid;grid-template-columns:250px minmax(0,1fr) 360px;gap:12px;padding:12px;align-items:start}
-aside{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:12px;position:sticky;top:56px;max-height:calc(100vh - 70px);overflow:auto}
-@media(max-width:1000px){main{grid-template-columns:minmax(0,1fr)}aside{position:static;max-height:none}}
-summary{cursor:pointer;font-weight:600;margin-bottom:8px}
-label{display:block;margin:8px 0;color:var(--mu);font-size:12px}label input,label select{display:block;width:100%;margin-top:3px;padding:7px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit}
-label.chk{display:flex;gap:8px;align-items:center;color:var(--tx)}label.chk input{width:auto;margin:0}
-.card,.wc{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer}.card.sel{border-color:var(--bl)}
-.hd{display:flex;justify-content:space-between;gap:8px}.age{color:var(--bl);font-weight:600}
-.tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
-.score{min-width:38px;text-align:center;padding:3px 8px;border-radius:6px;font-weight:700;color:#06100a}
-.s-strong{background:var(--gr)}.s-prom{background:var(--bl)}.s-watch{background:var(--am)}.s-weak{background:#59626a;color:#fff}
-.risk{padding:2px 8px;border-radius:6px;border:1px solid;font-size:12px}
-.r-LOW{color:var(--gr)}.r-MODERATE{color:var(--am)}.r-HIGH{color:var(--rd)}.r-UNKNOWN{color:var(--mu)}
-.whale{color:var(--bl);font-size:12px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 6px;margin:8px 0 12px}.stats small{display:block;color:var(--mu);font-size:11px}
-.open{display:block;text-align:center;background:var(--gr);color:#04140a;font-weight:800;padding:13px;border-radius:8px;text-decoration:none;font-size:15px}
-.mini{display:flex;gap:8px;margin-top:8px}.mini button,.mini a{flex:1;text-align:center;padding:8px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit;font-size:12px;text-decoration:none;cursor:pointer}
-h3{margin:0 0 8px}.bar{display:flex;justify-content:space-between;font-size:12px;margin-top:6px}.track{height:5px;background:var(--bg);border-radius:3px}.track div{height:5px;background:var(--bl);border-radius:3px}
-.why{margin:6px 0;padding-left:8px;border-left:3px solid var(--am);font-size:13px}.why.confirmed{border-color:var(--rd)}
-.tr{display:flex;justify-content:space-between;font-size:12px;padding:2px 0}.buy{color:var(--gr)}.sell{color:var(--rd)}
-.empty{padding:28px 12px;text-align:center;color:var(--mu)}footer{padding:4px 14px 24px;color:var(--mu);font-size:12px}
-.nw{background:var(--gr);color:#04140a;font-weight:700;font-size:11px;padding:2px 6px;border-radius:5px}.mini input{flex:2;min-width:0;padding:8px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit}.wc p{margin:6px 0}#pin{flex-basis:100%}#pin:empty{display:none}
-.pinbox{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;border:1px solid var(--gr);background:#0f2a1a}.pinbox.bad{border-color:var(--rd);background:#2a1014}
-.pinbox .open{padding:8px 12px;font-size:13px;flex:0 0 auto}.pinbox button{padding:6px 10px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit;font-size:12px}
-#toast{position:fixed;left:12px;right:12px;bottom:16px;background:var(--pn);border:1px solid var(--am);border-radius:8px;padding:10px;z-index:40}
-#ack{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:50;align-items:center;justify-content:center;padding:16px}#ack .box{background:var(--pn);border:1px solid var(--ln);border-radius:12px;padding:16px;max-width:460px;max-height:90vh;overflow:auto}#ack li{margin:6px 0}
-.lr h3{margin:16px 0 4px}.lr p,.lr li{margin:4px 0;color:var(--tx)}.lr ul{padding-left:18px;margin:4px 0}
-main>section{min-width:0}.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;white-space:nowrap;-webkit-overflow-scrolling:touch}.chips .lb{flex:0 0 auto;align-self:center;color:var(--mu);font-size:12px;min-width:34px}
-.chip{flex:0 0 auto;padding:7px 11px;border-radius:99px;border:1px solid var(--ln);background:var(--bg);color:var(--mu);font:inherit;font-size:13px}.chip.on{color:var(--tx);border-color:var(--bl);background:#12202c}.chip i{font-style:normal;color:var(--mu);margin-left:4px;font-size:11px}
-.chip[data-r=LOW].on{border-color:var(--gr)}.chip[data-r=MODERATE].on{border-color:var(--am)}.chip[data-r=HIGH].on{border-color:var(--rd)}
-.chip.god{border-color:#d4af37;color:#f3d77a;font-weight:700;letter-spacing:.5px}.chip.god.on{background:#2a2208;border-color:#ffd54a;color:#ffe58a}a.chip{text-decoration:none;display:inline-block;padding:3px 9px}
-.mk{width:100%;margin-top:8px;padding:10px;background:var(--bl);color:#04101a;font-weight:700;border:0;border-radius:8px;font:inherit}
-/* GOD MODE: focused, fast scanning; bubble map is observed balances, not linked on-chain clusters. */
-.api-controls{padding:10px;margin:10px 0;background:#10171d;border:1px solid #2d4556;border-radius:9px}
-.api-controls .mini button{background:#18344a;border-color:#3c6b8c}
-.api-controls input{font-size:12px}
-.micro{font-size:11px;color:var(--mu);line-height:1.5}
-.god-switch{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
-.god-switch button{border:1px solid #675829;background:#191910;color:#c4b176;border-radius:7px;padding:7px 10px;cursor:pointer}
-.god-switch button.on{background:#382a07;color:#ffe18c;border-color:#efc349}
-.bubble-wrap{border:1px solid var(--ln);border-radius:9px;background:#11191f;padding:10px;margin:12px 0}
-.bubble-wrap svg{width:100%;height:auto;max-height:290px;display:block;background:radial-gradient(circle at 50% 42%,#14232d,#101519);border-radius:7px}
-.bubble-wrap circle[data-bwallet]{cursor:pointer;stroke:#e7eef3;stroke-width:.7;stroke-opacity:.45}
-.bubble-wrap circle[data-bwallet]:hover,.bubble-wrap circle[data-bwallet]:focus{stroke:white;stroke-width:2.2;outline:none}
-.bubble-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;margin-top:8px;color:var(--mu)}
-.bubble-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px}
-.bubble-explain{margin:6px 0 0;font-size:11px;color:var(--mu)}
-.quick-tag{padding:3px 8px;border-radius:6px;border:1px solid #78672a;color:#efd683;font-size:12px}
-.fast-heading{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 10px}
-.fast-heading strong{color:#ffe18c}
-@media(max-width:1000px){.bubble-wrap svg{max-height:350px}}
+:root{color-scheme:dark;--bg:#0a1016;--pane:#121c25;--pane2:#17232e;--border:#293b4b;--txt:#e9f4fc;--mut:#92a7b6;--green:#38e6a0;--yellow:#f8cf70;--red:#ff7182;--blue:#59bdff;--violet:#bd9cfe}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.42 system-ui,-apple-system,'Segoe UI',sans-serif}button,input,select{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer}a{color:inherit}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.top{position:sticky;top:0;background:rgba(10,16,22,.98);border-bottom:1px solid var(--border);padding:11px max(16px,env(safe-area-inset-left));z-index:10;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.brand{font-weight:900;font-size:19px;letter-spacing:-.4px}.brand em{color:var(--green);font-style:normal}.tag{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:7px;padding:4px 8px;font-size:12px}.tag.good{border-color:#2d8e72;color:var(--green)}.tag.warn{border-color:#856d35;color:var(--yellow)}.tag.bad{border-color:#964050;color:var(--red)}.spacer{flex:1}.sm{font-size:12px;color:var(--mut)}
+.shell{display:grid;grid-template-columns:minmax(240px,275px) minmax(0,1fr) minmax(280px,340px);gap:13px;max-width:1700px;margin:auto;padding:13px}.panel{background:var(--pane);border:1px solid var(--border);border-radius:13px;padding:13px;min-width:0}.sticky{position:sticky;top:73px;max-height:calc(100vh - 86px);overflow-y:auto}h1,h2,h3,p{margin-top:0}h2{font-size:16px;margin-bottom:9px}h3{font-size:14px;margin-bottom:8px}.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase;font-weight:750}.mut{color:var(--mut)}.warning{background:#242014;border:1px solid #62512d;color:#f2deb2;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.5;margin:10px 0}.notice{background:#10252b;border:1px solid #245a70;color:#a9deea;padding:10px;border-radius:9px;font-size:12px}.field{margin:10px 0}.field>span{display:block;font-size:12px;color:var(--mut);margin-bottom:5px}.field input,.field select,.input{width:100%;background:#0a131d;border:1px solid #405365;border-radius:8px;color:var(--txt);padding:10px;min-height:41px}.field select{appearance:auto}.inline{display:flex;gap:8px;align-items:center}.inline>*{min-width:0}.inline .stretch{flex:1}.btn{border:1px solid #496278;border-radius:8px;padding:9px 12px;background:#1b3445;color:var(--txt);font-weight:650;white-space:nowrap;min-height:38px}.btn.on{background:#205c43;border-color:var(--green);color:#eafff2}.btn.gold{background:#44391a;border-color:#a38940;color:#ffe08a}.btn.secondary{background:#17232e}.btn.critical{border-color:#b84e60;color:#ffc4cd;background:#371d27}.btn:hover,.linkbtn:hover{filter:brightness(1.13)}.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.tabs .btn{font-size:13px}.split{display:flex;gap:8px;align-items:center;justify-content:space-between}.wrap{flex-wrap:wrap}.hr{border:0;border-top:1px solid var(--border);margin:14px 0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}.metric{background:#101b25;border:1px solid #21394a;border-radius:10px;padding:10px}.metric b{display:block;font-size:20px;font-variant-numeric:tabular-nums}.metric span{font-size:11px;color:var(--mut)}.mono{font-variant-numeric:tabular-nums}.hero{border:1px solid #755d2f;border-radius:10px;background:linear-gradient(110deg,#342710,#141d26);padding:12px;margin-bottom:10px}.hero b{color:#ffe08a}.hero .sm{color:#d8c9a5}.sort{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:9px 0}.sort select{max-width:190px}.list{display:grid;gap:8px}.token{border:1px solid #304556;border-radius:12px;background:#131f29;padding:11px;transition:border-color .15s}.token.selected{border-color:var(--blue)}.token.headline{border-color:#967d35}.token .title{font-size:15px;font-weight:800;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.token .meta{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:7px 0}.token .mini-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0}.token .mini-grid div{font-size:12px;overflow:hidden}.token .mini-grid span{font-size:10px;display:block;color:var(--mut)}.status{font-size:10px;letter-spacing:.06em;font-weight:900;border-radius:5px;border:1px solid;padding:4px 6px}.status.launch{color:var(--yellow);border-color:#ad8944}.status.building{color:var(--blue);border-color:#3c8ec4}.status.checked{color:var(--green);border-color:#38a777}.risk{font-size:11px;border:1px solid;padding:3px 6px;border-radius:5px}.risk.HIGH{color:var(--red);border-color:#92394d}.risk.LIMITED{color:var(--yellow);border-color:#756329}.risk.OBSERVED{color:var(--green);border-color:#37775d}.green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}.yellow{color:var(--yellow)}.purple{color:var(--violet)}.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.linkbtn{background:#164b36;color:#d7ffe9;border:1px solid #2d9b6e;border-radius:8px;padding:8px 10px;text-decoration:none;font-weight:800;font-size:12px;display:inline-flex;align-items:center;justify-content:center}.linkbtn.ghost{background:#183049;border-color:#386585;color:#bfe8ff}.actions .linkbtn{flex:1}.actions .btn{flex:1}.empty{text-align:center;padding:38px 16px;color:var(--mut);border:1px dashed var(--border);border-radius:12px}.pulse{border:1px solid #40506c;border-radius:11px;background:#171f2b;padding:11px;margin:8px 0}.pulse a{color:#badcff}.pulse .post{border-top:1px solid #334352;padding-top:7px;margin-top:7px;line-height:1.4}.pulse .post a{text-decoration:underline;text-underline-offset:2px}.bubble{background:radial-gradient(circle at center,#1c3340,#0d151d);border:1px solid var(--border);width:100%;border-radius:9px;min-height:206px}.mapmeta{font-size:11px;color:var(--mut);margin:5px 0 12px}.rows{display:grid;gap:5px}.rw{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #253746;padding:5px 0;font-size:12px}.rw strong{white-space:nowrap}.bar{height:5px;background:#0b141b;border-radius:6px;overflow:hidden;margin:4px 0 8px}.bar i{display:block;background:var(--blue);height:100%}.foot{text-align:center;color:var(--mut);font-size:11px;padding:12px 15px 25px;max-width:1120px;margin:auto}
+#toast{position:fixed;bottom:17px;left:13px;right:13px;z-index:100;margin:auto;max-width:560px;background:#273548;border:1px solid #9e8142;border-radius:10px;padding:13px;display:none;box-shadow:0 5px 30px #0009}#help{line-height:1.58}.newflash{animation:flash 1.15s ease-out}@keyframes flash{from{box-shadow:inset 0 0 0 2px #d6ba65}to{box-shadow:none}}
+@media(max-width:1230px){.shell{grid-template-columns:235px minmax(0,1fr)}#detail{grid-column:2;position:static;max-height:none}}@media(max-width:760px){.shell{display:flex;flex-direction:column;padding:8px}.sticky{position:static;max-height:none}.top{padding:8px 11px}.stats{grid-template-columns:repeat(2,1fr)}.panel{padding:10px}#filters details:not([open]){margin-bottom:0}.token .mini-grid{grid-template-columns:repeat(2,1fr)}.token .title{max-width:180px}}@media(prefers-reduced-motion:reduce){.newflash{animation:none}}
 </style></head><body>
-<header><b class="logo">Pump<i>Vision</i> AI</b><span id="st" class="pill"></span><span>New in 5 min: <b id="n1">0</b></span><span>Score 70+: <b id="n2">0</b></span><span class="mu" id="lat"></span><span class="mu" id="faststat">3-minute radar: 0</span><div id="pin"></div></header>
-<div id="toast" style="display:none"></div>
-<div id="ack" style="display:none"><div class="box"><h3>Before you start</h3><ul><li>This is a scanner. It does not tell you what to buy and cannot predict prices.</li><li>New tokens are extremely risky. You can lose everything you put in, so only use money you can afford to lose.</li><li>Scores, wallet rankings and risk labels can be wrong or gamed by bots.</li><li>This site never asks for your wallet or seed phrase. Never share your seed phrase, and ignore anyone who asks for it.</li><li>Try the practice account in My trades first. It uses fake money.</li><li>Not financial advice. Independent tool, not endorsed by Pump.fun or Anthropic.</li></ul><button id="ackBtn" class="mk">I understand</button></div></div>
-<main>
-<aside><details open><summary>Filters</summary>
-<div class="mini"><button id="pAll">Show all</button><button id="pQuick">Quick trade</button><button id="pStrict">Stricter</button></div>
- <div class="api-controls"><b>Live trade-data access</b><p class="micro">New launches are free. PumpPortal now requires a data API key for live buy/sell streams (metered SOL charges). Without a key, bubble and momentum data cannot be verified.</p>
- <div class="mini"><input type="password" id="apiKey" autocomplete="off" placeholder="PumpPortal DATA API key (not private key)" aria-label="PumpPortal data API key"><button id="connectKey">Connect</button></div>
- <div class="mini"><button id="disconnectKey">Launch-only mode</button><a href="https://pumpportal.fun/data-api/real-time/" target="_blank" rel="noopener noreferrer">API setup &amp; fees</a></div>
- <p class="micro" id="keyStatus">Launch-only mode. No key saved.</p><p class="micro bad">Never paste a seed phrase or wallet private key. The API key stays in this page's memory until reload and is sent only to PumpPortal over WSS.</p></div>
-<label>Sort by<select id="sort"><option value="score">Highest score</option><option value="new">Newest</option><option value="fast">Most trades (last 10s)</option><option value="move">Biggest move since launch</option></select></label>
-<label>Token age<select id="age"><option value="0-300">Last 5 minutes</option><option value="0-30">0 to 30 seconds</option><option value="30-60">30 to 60 seconds</option><option value="60-120">1 to 2 minutes</option><option value="120-180">2 to 3 minutes</option><option value="180-300">3 to 5 minutes</option></select></label>
-<label>Minimum score<input id="score" type="number" value="0"></label>
-<label>Minimum unique buyers<input id="buyers" type="number" value="0"></label>
-<label>Minimum buy/sell ratio<input id="ratio" type="number" step="0.1" value="0"></label>
-<label>Minimum net SOL in<input id="net" type="number" step="0.5" value="0"></label>
-<label>Max top-holder %<input id="top" type="number" value="100"></label>
-<label class="chk"><input id="hide" type="checkbox"> Exclude HIGH risk</label>
-<label class="chk"><input id="snd" type="checkbox"> Sound alert for new matches</label>
-<label>Alert at score<input id="aS" type="number" value="70"></label>
-<label>Most I can lose per trade (SOL)<input id="mx" type="number" step="0.01" placeholder="enter your limit"></label>
-<label>Stop-loss %<input id="sl" type="number" value="12"></label>
-<label>Target %<input id="tp" type="number" value="50"></label>
-<label>Max hold (minutes)<input id="mh" type="number" value="15"></label>
-<label>Practice balance in SOL (applies on reset)<input id="pb" type="number" step="0.1" value="1"></label>
-<label>Assumed fee per trade side (%)<input id="fee" type="number" step="0.1" value="1"></label>
-<p class="mu small">Defaults show every new token, best score first. High-risk tokens show a red label. Most new tokens lose value fast, so only risk money you can afford to lose.</p></details></aside>
-<section><div class="mini" id="tabs"><button data-v="tokens">Tokens</button><button data-v="wallets">Wallets</button><button data-v="mine">My trades</button><button data-v="learn">Learn</button></div>
-<div id="wbar" style="display:none"><p class="mu small">Wallets are ranked from trades this page has seen since you opened it. Profit is estimated at the bonding-curve price, before fees and slippage, and a short sample does not prove skill. Wallets that win by sniping may be bots or insiders. Following a wallet means buying after it, and it may sell first.</p><div class="mini"><input id="wIn" placeholder="Paste a wallet address to watch"><button id="wAdd">Watch</button></div><p class="small bad" id="wMsg"></p></div>
-<div id="chips" style="margin-top:8px"></div><div id="feed" style="margin-top:6px"></div></section>
-<aside id="detail"></aside>
-</main>
-<footer>Scores describe observed early trading activity, not future returns. Unknown data is never treated as safe. Scans only while this page is open. Early Radar is not a buy signal. Bubble circles use wallet balances observed in this session, not all top holders or wallet transfer links. Live trades require a separate PumpPortal API key and cost SOL. Ages count from first detection in the stream. USD values are unavailable in this version (needs a SOL price feed). Wallet profit figures are estimates from trades this page has seen. Not financial advice. Independent tool, not endorsed by Pump.fun or Anthropic.</footer>
+<header class="top"><div class="brand">Pump<em>Vision</em> <span class="yellow">TURBO</span></div><span id="connection" class="tag warn">Connecting…</span><span id="dataStatus" class="tag">Launch-only</span><span id="xStatus" class="tag">X: not connected</span><span class="spacer"></span><button class="btn secondary" id="sound" title="Enable audible alerts for new trade-checked coins; works only while the page is active">🔕 Alerts off</button><button class="btn critical" id="panic" title="Stops paper trading. No real trades are placed.">STOP PRACTICE</button></header>
+<div id="toast" role="status" aria-live="polite"></div>
+<div class="shell"><aside class="panel sticky" id="filters">
+<details open><summary class="eyebrow">Scanner controls</summary>
+<div class="field"><span>Mode</span><div class="inline wrap"><button id="earlyBtn" class="btn gold on">⚡ GOD RADAR</button><button id="checkedBtn" class="btn">TRADE CHECKED</button></div></div>
+<div class="field"><span>Sort by</span><select id="sort"><option value="new" selected>⚡ Just launched (fastest)</option><option value="signal">Signal strength</option><option value="flow">Trades / 10s</option><option value="social">X mentions</option></select></div>
+<div class="field"><span>Maximum age (seconds)</span><select id="maxAge"><option value="30">30</option><option value="60">60</option><option value="120">120</option><option value="180" selected>180 (3 minutes)</option><option value="300">300 (5 minutes)</option></select></div>
+<div class="field"><span>Minimum unique buyers</span><input type="number" id="minBuyers" value="0" min="0" max="500" step="1"></div>
+<div class="field"><span>Only show coins without observed HIGH flags</span><label class="inline"><input type="checkbox" id="hideHigh" checked> <span class="sm">Hide obvious red flags</span></label></div>
+<hr class="hr"><h3>Paid live trade data — optional</h3><p class="sm">New token detection is free. PumpPortal buy/sell streams require a data API key and charge SOL. The key stays in this browser tab only.</p><div class="field"><span>Data API key (never a wallet secret)</span><input id="pumpKey" class="input" type="password" autocomplete="off" placeholder="Enter data API key only"></div>
+<div class="inline wrap"><button class="btn" id="keyConnect">Enable trade feed</button><button class="btn secondary" id="keyDisconnect">Free launches only</button></div><div class="field"><span>Max concurrently tracked tokens</span><select id="subCap"><option value="8">8 (lower fees)</option><option value="16" selected>16 (balanced)</option><option value="32">32 (higher fees)</option></select></div><p class="sm" id="streamInfo">0 paid subscriptions</p>
+<hr class="hr"><h3>X / Twitter social radar</h3><p class="sm">A read-only Cloudflare Worker checks public X posts for real mint addresses. X access requires a separate API and may cost money.</p><div class="field"><span>Your deployed Worker URL (public; no API secret)</span><input id="workerUrl" class="input" type="url" placeholder="https://pumpvision-x.YOU.workers.dev"></div><div class="inline wrap"><button class="btn" id="saveWorker">Connect X feed</button><button class="btn secondary" id="removeWorker">Disconnect</button></div><p id="workerInfo" class="sm">Not connected. The X search links still work.</p><p class="sm"><a href="https://console.x.com/" target="_blank" rel="noopener noreferrer">X developer access</a> · <a href="https://pumpportal.fun/data-api/real-time/" target="_blank" rel="noopener noreferrer">PumpPortal setup</a></p>
+</details></aside>
+<main style="min-width:0"><div class="tabs" id="tabs"><button class="btn on" data-tab="radar">⚡ Live Radar</button><button class="btn" data-tab="x">𝕏 Social Pulse</button><button class="btn" data-tab="watch">Wallet Watch</button><button class="btn" data-tab="paper">Practice</button><button class="btn" data-tab="guide">Guide</button></div>
+<div class="stats"><div class="metric"><b id="metricLaunch">0</b><span>launches ≤3 min</span></div><div class="metric"><b id="metricEarly">0</b><span>early candidates</span></div><div class="metric"><b id="metricChecked">0</b><span>trade checked</span></div><div class="metric"><b id="metricX">0</b><span>X coins found</span></div></div>
+<div id="hero" class="hero"><b>⚡ Immediate discovery is enabled</b><div class="sm">New launches appear as soon as the WebSocket receives them. A newly created coin is not a verified trading opportunity.</div></div>
+<div class="sort split wrap"><div id="feedTitle" class="eyebrow">Fast Launch Radar</div><div class="sm" id="latency">Waiting for first event</div></div>
+<div class="list" id="feed"><div class="empty">Connecting to the token launch stream…</div></div></main>
+<aside class="panel sticky" id="detail"><h2>Coin details and holder bubbles</h2><p class="mut">Tap any coin to inspect early buyers, price activity, observed-wallet bubbles, and X mentions.</p></aside></div>
+<footer class="foot">Scanner only. No buy or sell orders are transmitted. New-coin scores, observed holder bubbles and X post counts can be gamed or incomplete; they cannot predict returns. A browser tab cannot guarantee 24/7 monitoring or execute guaranteed stop-losses. Open Pump.fun yourself to trade. Never paste a seed phrase/private key.</footer>
 <script>
-// Momentum scoring + risk analysis. Pure functions: no network, easy to test.
-const CFG = {
-  weights: { buyPressure: 25, volumeAccel: 20, buyerGrowth: 15, liquidity: 15, holders: 10, price: 10, integrity: 5 },
-  supply: 1e9, liquiditySolFull: 10, topHolderWarn: 0.25, topHolderRisk: 0.4, devWarn: 0.1,
-  whaleSol: 5, minTradesForRating: 8, confirmedPenalty: 15, warningPenalty: 5,
-};
-const c = (x, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, Number.isFinite(x) ? x : 0));
-const label = s => (s >= 85 ? 'Strong momentum signals' : s >= 70 ? 'Promising' : s >= 50 ? 'Watchlist' : 'Weak signals');
-const UNVERIFIED = [
-  'Mint and freeze authority (needs Solana RPC)',
-  'Connected-wallet clusters and bundled launches',
-  'Real liquidity (stream only shows curve state and observed flow)',
-  'Whether any large wallet is profitable or related to another',
-];
-const SNAMES = { buyPressure: 'buy pressure', volumeAccel: 'volume acceleration', buyerGrowth: 'unique buyer growth', liquidity: 'net SOL inflow', holders: 'holder spread', price: 'price momentum', integrity: 'launch integrity' };
-
-function analyze(tok, now = Date.now(), cfg = CFG) {
-  const tr = tok.trades, W = cfg.weights, n = tr.length;
-  const win = (a, b) => tr.filter(t => now - t.t >= a * 1000 && now - t.t < b * 1000);
-  const of = (a, s) => a.filter(t => t.side === s);
-  const sol = a => a.reduce((s, t) => s + t.sol, 0);
-  const uniq = a => new Set(of(a, 'buy').map(t => t.who)).size;
-  const buys = of(tr, 'buy'), sells = of(tr, 'sell');
-  const w10 = win(0, 10), w30 = win(0, 30), w60 = win(0, 60), p30 = win(30, 60), p60 = win(60, 120);
-  const bs60 = sol(of(w60, 'buy')), ss60 = sol(of(w60, 'sell'));
-  const netSol = sol(buys) - sol(sells);
-  const bal = Object.values(tok.balances).sort((a, b) => b - a);
-  const top1 = (bal[0] || 0) / cfg.supply;
-  const devPct = (tok.balances[tok.creator] || 0) / cfg.supply;
-  const devSold = sells.some(t => t.who === tok.creator);
-  const pr = tok.prices, pNow = pr.length ? pr[pr.length - 1].p : null;
-  const at = ms => { let r = null; for (const x of pr) { if (now - x.t >= ms) r = x; else break; } return r || pr[0]; };
-  const chg60 = pr.length > 1 ? pNow / at(60000).p - 1 : 0;
-  const peak = pr.length ? Math.max(...pr.map(x => x.p)) : 0;
-  const dd = peak ? 1 - pNow / peak : 0;
-  const spikeDump = pr.length > 1 && peak / pr[0].p > 2 && dd > 0.4;
-  const amt = {}; tr.forEach(t => { const k = t.sol.toFixed(3); amt[k] = (amt[k] || 0) + 1; });
-  const repeat = n >= 10 && Math.max(...Object.values(amt)) / n >= 0.4;
-  const big = w60.filter(t => t.sol >= cfg.whaleSol);
-  const sn = [...(tok.snipers || [])], snPct = sn.reduce((s, w) => s + (tok.balances[w] || 0), 0) / cfg.supply;
-
-  const conf = c(n / cfg.minTradesForRating); // thin data earns little credit
-  const comp = {
-    buyPressure: c((bs60 / (bs60 + ss60 || 1) - 0.5) / 0.4) * c(w60.length / 6),
-    volumeAccel: c(((sol(w30) + 0.1) / (sol(p30) + 0.1) - 1) / 2) * c(w30.length / 4),
-    buyerGrowth: 0.5 * c(uniq(w60) / 15) + 0.5 * c((uniq(w60) - uniq(p60)) / 8),
-    liquidity: c(netSol / cfg.liquiditySolFull) * conf,
-    holders: bal.length >= 3 ? (1 - c(top1 / 0.3)) * conf : 0, // unknown is not credited
-    price: c(chg60 / 0.5) * conf,
-    integrity: c(1 - (devPct > cfg.devWarn ? 0.5 : 0) - (devSold ? 1 : 0) - (repeat ? 0.5 : 0)) * conf,
-  };
-
-  const reasons = [], R = (kind, text) => reasons.push({ kind, text });
-  const pc = x => (x * 100).toFixed(0) + '%';
-  if (devSold) R('confirmed', 'Creator wallet sold tokens after launch (seen in stream)');
-  if (top1 >= cfg.topHolderRisk) R('confirmed', `One observed wallet holds ${pc(top1)} of supply`);
-  if (spikeDump) R('confirmed', `Price is ${pc(dd)} below its peak after a spike above 2x`);
-  if (top1 >= cfg.topHolderWarn && top1 < cfg.topHolderRisk) R('warning', `One observed wallet holds ${pc(top1)} of supply`);
-  if (devPct >= cfg.devWarn && !devSold) R('warning', `Creator holds ${pc(devPct)} of supply`);
-  if (repeat) R('warning', 'Many trades share identical SOL amounts (possible scripted activity, unverified)');
-  if (sn.length >= 3 && snPct >= 0.15) R('warning', `${sn.length} wallets bought within 3s of launch and hold ${pc(snPct)} (possible insiders or snipers; any link between them is unverified)`);
-  if (n >= cfg.minTradesForRating && netSol < 1) R('warning', 'Little net SOL has entered the curve (low liquidity proxy)');
-  if (ss60 > bs60 && w60.length >= 6) R('warning', 'Selling outweighs buying over the last 60s');
-  const nc = reasons.filter(r => r.kind === 'confirmed').length, nw = reasons.length - nc;
-
-  const raw = Object.keys(comp).reduce((s, k) => s + comp[k] * W[k], 0) - nc * cfg.confirmedPenalty - nw * cfg.warningPenalty;
-  const score = Math.round(c(raw, 0, 100));
-  const risk = nc ? 'HIGH' : n < cfg.minTradesForRating ? 'UNKNOWN' : nw ? 'MODERATE' : 'LOW';
-  if (risk === 'UNKNOWN') R('warning', `Only ${n} trades observed so far, too few to rate risk`);
-
-  const strong = Object.keys(comp).sort((a, b) => comp[b] - comp[a]).filter(k => comp[k] >= 0.5).slice(0, 2).map(k => SNAMES[k]);
-  const explain = `Momentum score: ${score}/100. ` + (strong.length ? `Strongest signals: ${strong.join(' and ')}. ` : 'No signal is strong yet. ') + (reasons[0] ? `Main concern: ${reasons[0].text}.` : '');
-  const step = Math.max(1, Math.floor(pr.length / 60));
-  const short = w => (w ? w.slice(0, 4) + '…' + w.slice(-4) : '?');
-
-  return {
-    mint: tok.mint, name: tok.name, symbol: tok.symbol, firstSeen: tok.firstSeen,
-    mcSol: tok.mcSol, priceSol: pNow, buys: buys.length, sells: sells.length,
-    ratio: buys.length / Math.max(sells.length, 1), buyers: uniq(tr), volSol: sol(tr), netSol,
-    top1, devPct, tps10: w10.length, chg60, since: pr.length > 1 ? pNow / pr[0].p - 1 : 0, fromPeak: -dd, snipers: sn.length, snPct, devSold, res: tok.res || null, score, label: label(score), risk, reasons, unverified: UNVERIFIED,
-    parts: Object.keys(comp).map(k => ({ k, pts: +(comp[k] * W[k]).toFixed(1), max: W[k] })),
-    explain, whale: big.length ? Math.max(...big.map(t => t.sol)) : 0,
-    series: pr.filter((_, i) => i % step === 0).map(x => x.p),
-    recent: tr.slice(-12).reverse().map(t => ({ ago: now - t.t, side: t.side, sol: t.sol, who: short(t.who) })),
-  };
-}
-
-const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const NAMES={buyPressure:'Buy pressure',volumeAccel:'Volume acceleration',buyerGrowth:'Unique buyer growth',liquidity:'Net SOL inflow',holders:'Holder spread',price:'Price momentum',integrity:'Launch integrity'};
-let D={tokens:[],status:'connecting',now:0,lastMsg:0},got=0,sel=null,down=false,sseOk=false;
-const F={};function readF(){const[a,b]=$('#age').value.split('-').map(Number);Object.assign(F,{a,b,score:+$('#score').value||0,buyers:+$('#buyers').value||0,ratio:+$('#ratio').value||0,net:+$('#net').value||0,top:+$('#top').value||100,hide:$('#hide').checked,sort:$('#sort').value,aS:+$('#aS').value||0,snd:$('#snd').checked})}
-const ageMs=f=>D.now-f+(Date.now()-got),fmt=ms=>{const s=Math.max(0,Math.floor(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-const cls=s=>s>=85?'s-strong':s>=70?'s-prom':s>=50?'s-watch':'s-weak';
-const pass=t=>{const a=ageMs(t.firstSeen)/1000;if(CH.god)return godPass(t);return a>=F.a&&a<F.b+(F.b===300?1:0)&&t.score>=F.score&&t.buyers>=F.buyers&&t.ratio>=F.ratio&&t.netSol>=F.net&&t.top1*100<=F.top&&!(F.hide&&t.risk==='HIGH')&&chipPass(t)};
-function card(t){const n=(v,d=2)=>v==null?'n/a':v.toFixed(d);const pc=v=>(v>=0?'+':'')+(v*100).toFixed(0)+'%';return`<article class="card${t.mint===sel?' sel':''}" data-m="${t.mint}"><div class="hd"><div><b>${esc(t.name||'Unnamed')}</b> <span class="mu">$${esc(t.symbol)}</span></div><span class="age" data-f="${t.firstSeen}">${fmt(ageMs(t.firstSeen))}</span></div>
-<div class="tags"><span class="score ${cls(t.score)}">${t.score}</span><span class="mu">${esc(t.label)}</span><span class="risk r-${t.risk}">${t.risk} risk</span>${t.snipers>=3&&t.snPct>=0.15?`<span class="risk r-MODERATE">Fast buyers hold ${(t.snPct*100).toFixed(0)}%</span>`:''}${newTill[t.mint]>Date.now()?'<span class="nw">NEW</span>':''}${t.whale?`<span class="whale">Whale trade ${t.whale.toFixed(1)} SOL</span>`:''}</div>
-${entryHtml(t)}${godHtml(t)}<div class="stats">${[['Mkt cap',n(t.mcSol,1)+' SOL'],['Price',t.priceSol==null?'n/a':t.priceSol.toExponential(2)+' SOL'],['Volume',n(t.volSol)+' SOL'],['Net in',n(t.netSol)+' SOL'],['Buys / sells',t.buys+' / '+t.sells],['Buy:sell',n(t.ratio)],['Buyers',t.buyers],['Top holder',(t.top1*100).toFixed(1)+'%'],['Since launch',pc(t.since)],['From peak',pc(t.fromPeak)],['Trades / 10s',t.tps10],['Dev holds',(t.devPct*100).toFixed(1)+'%']].map(([k,v])=>`<div><small>${k}</small>${v}</div>`).join('')}</div>
-<a class="open" href="https://pump.fun/coin/${t.mint}" target="_blank" rel="noopener noreferrer">OPEN ON PUMP.FUN</a><div class="mini"><button data-bubbles="${esc(t.mint)}">View wallet bubbles</button><a href="https://v2.bubblemaps.io/?chain=solana" target="_blank" rel="noopener noreferrer">Full Bubblemaps ↗</a></div>
-<div class="mini"><button data-copy="${t.mint}">Copy mint</button><a href="https://dexscreener.com/solana/${t.mint}" target="_blank" rel="noopener noreferrer">DexScreener</a></div></article>`}
-const SORTS={score:(a,b)=>b.score-a.score,new:(a,b)=>b.firstSeen-a.firstSeen,fast:(a,b)=>b.tps10-a.tps10||b.score-a.score,move:(a,b)=>b.since-a.since};
-let ac=null,al=new Set(),ready=false,newTill={},view='tokens',wHit=0,WB=[];
-const pc=v=>(v>=0?'+':'')+(v*100).toFixed(0)+'%',short=w=>w.slice(0,4)+'…'+w.slice(-4);
-let watch=new Set();try{watch=new Set(JSON.parse(localStorage.getItem('pv_watch')||'[]').filter(w=>typeof w==='string'))}catch{}
-function bestBuy(w){for(const b of wb.get(w)||[]){const t=D.tokens.find(x=>x.mint===b.mint),tk=tokens.get(b.mint),p=tk&&tk.pos[w];if(!t||!p)continue;if(t.risk!=='LOW'&&t.risk!=='MODERATE')continue;if(p.out>=0.5*p.in)continue;return{b,t}}return null}
-function row(w,a,watching){const bb=bestBuy(w);
-return `<article class="wc"><div class="hd"><b>${esc(short(w))}</b><span class="mu small">${a?`${a.n} tokens, ${(a.wr*100).toFixed(0)}% up, est. ${a.pnl>=0?'+':''}${a.pnl.toFixed(2)} SOL`:'no stats yet'}</span></div>
-${a&&a.early>=3?`<div class="tags"><span class="risk r-MODERATE">Early buyer on ${a.early} tokens (could be a bot or insider)</span></div>`:''}
-${bb?`<p>Latest safer buy: <b>${esc(bb.t.name||'Unnamed')}</b> $${esc(bb.t.symbol)}, ${Math.round((Date.now()-bb.b.at)/1000)}s ago for ${bb.b.sol.toFixed(2)} SOL. Price since their buy: <b>${bb.b.px&&bb.t.priceSol?pc(bb.t.priceSol/bb.b.px-1):'n/a'}</b>. Risk ${bb.t.risk}, score ${bb.t.score}.</p><a class="open" href="https://pump.fun/coin/${esc(bb.b.mint)}" target="_blank" rel="noopener noreferrer">OPEN THEIR LATEST SAFER BUY</a>`:'<p class="mu small">No recent buy passes the check: rated LOW or MODERATE, and the wallet has not sold half.</p>'}
-<div class="mini"><button data-copy="${esc(w)}">Copy wallet</button><button data-w="${esc(w)}">${watching?'Unwatch':'Watch'}</button></div></article>`}
-function walletView(){$('#n1').textContent=D.tokens.length;$('#n2').textContent=D.tokens.filter(t=>t.score>=70).length;
-const wl=[...watch].map(w=>row(w,WB.find(r=>r.w===w)||null,true)).join(''),cand=WB.filter(r=>!watch.has(r.w)).slice(0,12).map(r=>row(r.w,r,false)).join('');
-$('#feed').innerHTML=`<h3>Watching (${watch.size})</h3>${wl||'<p class="mu small">Tap Watch on a wallet below, or paste an address above.</p>'}<h3>Candidates from this session</h3>${cand||'<div class="empty">No wallet qualifies yet. It needs 3 or more tokens, a positive estimate and 60% winners. Keep this page open.</div>'}`}
-function toggleWatch(w){if(watch.has(w)){watch.delete(w);if(tradeApiKey)wsend({method:'unsubscribeAccountTrade',keys:[w]})}else{watch.add(w);if(tradeApiKey)wsend({method:'subscribeAccountTrade',keys:[w]})}try{localStorage.setItem('pv_watch',JSON.stringify([...watch]))}catch{}down=false;render()}
-function entryInfo(t){const r=[];let l=0;const up=(x,m)=>{l=Math.max(l,x);r.push(m)};
-if(t.risk==='HIGH')up(2,'risk is HIGH');if(t.since>=1.5)up(2,`already up ${pc(t.since)} since launch`);else if(t.since>=0.6)up(1,`already up ${pc(t.since)}`);
-if(t.fromPeak<=-0.4)up(2,`${pc(t.fromPeak)} from its peak`);else if(t.fromPeak<=-0.2)up(1,`${pc(t.fromPeak)} from its peak`);
-if(t.risk==='UNKNOWN')up(1,'too few trades to rate');if(t.risk==='MODERATE')up(1,'has warning signs');if(t.snipers>=3&&t.snPct>=0.15)up(1,'fast wallets hold a lot');
-if(t.tps10===0&&ageMs(t.firstSeen)>60000)up(1,'trading has stalled');return{l,r}}
-function entryHtml(t){const{l,r}=entryInfo(t);
-const c=['r-LOW','r-MODERATE','r-HIGH'][l],n=['no red flags seen','caution','avoid'][l];
-return `<div class="small" style="margin:0 0 8px"><span class="risk ${c}">Entry check: ${n}</span> <span class="mu">${r.join('; ')||'based on the data this page has'}</span></div>`}
-const RK=[['LOW','Low risk'],['MODERATE','Medium risk'],['HIGH','High risk'],['UNKNOWN','Not rated yet']],SK=[['score','Best score'],['new','Newest'],['fast','Most active'],['move','Biggest move']];
-const QF=[['u1','Under 1 min',t=>ageMs(t.firstSeen)<60000],['u2','Under 2 min',t=>ageMs(t.firstSeen)<120000],['nl','Not already pumped',t=>t.since<0.6],['bn','Buying now',t=>t.tps10>=3],['up','Price rising',t=>t.chg60>0],['wh','Whale buy',t=>t.whale>0],['nf','No fast-buyer cluster',t=>!(t.snipers>=3&&t.snPct>=0.15)],['ds','Dev has not sold',t=>!t.devSold],['ce','Clean entry check',t=>entryInfo(t).l===0]];
-let CH={risk:{LOW:1,MODERATE:1,HIGH:1,UNKNOWN:1},q:{},god:true,godTier:'early'};
-try{const c=JSON.parse(localStorage.getItem('pv_chips')||'null');if(c&&c.risk&&c.q)CH=c}catch{}
-if(CH.godTier!=='verified')CH.godTier='early';
-const saveChips=()=>{try{localStorage.setItem('pv_chips',JSON.stringify(CH))}catch{}};
-const chipPass=t=>!!CH.risk[t.risk]&&QF.every(([k,,f])=>!CH.q[k]||f(t));
-function chipsHtml(){const n=f=>D.tokens.filter(f).length;
-const ng=n(godPass),early=n(godEarlyPass),verified=n(godVerifiedPass);
-return `<div class="chips"><button class="chip god${CH.god?' on':''}" data-god="1">⚡ GOD MODE<i>${ng}</i></button></div>
-${CH.god?`<div class="god-switch"><button data-god-tier="early" class="${CH.godTier==='early'?'on':''}">EARLY RADAR (${early})</button><button data-god-tier="verified" class="${CH.godTier==='verified'?'on':''}">MORE EVIDENCE (${verified})</button></div><p class="small mu">${CH.godTier==='early'?'Instant launch discovery under 3 minutes. New coins appear before safety or buying momentum is known. Orange means preliminary. Not a buy signal.':'Requires observed trading activity, momentum and fewer visible red flags; still does NOT verify wallet connections, liquidity, or future returns.'} Scans while this page is open.</p>`:''}
-<div class="chips"><span class="lb">Show</span>${RK.map(([k,l])=>`<button class="chip${CH.risk[k]?' on':''}" data-r="${k}">${l}<i>${n(t=>t.risk===k)}</i></button>`).join('')}</div>
-<div class="chips"><span class="lb">Only</span>${QF.map(([k,l,f])=>`<button class="chip${CH.q[k]?' on':''}" data-q="${k}">${l}<i>${n(f)}</i></button>`).join('')}<button class="chip" data-reset="1">Reset</button></div>
-<div class="chips"><span class="lb">Sort</span>${SK.map(([k,l])=>`<button class="chip${F.sort===k?' on':''}" data-s="${k}">${l}</button>`).join('')}</div>`}
-let SMART=new Set();const META=new Map();let metaBusy=0;
-const IPFS=['ipfs.io','cloudflare-ipfs.com','dweb.link','nftstorage.link','gateway.pinata.cloud','mypinata.cloud'];
-const okUrl=(u,hosts)=>{try{const x=new URL(u);return x.protocol==='https:'&&(!hosts||hosts.some(d=>x.hostname===d||x.hostname.endsWith('.'+d)))?x.href:null}catch{return null}};
-function wantMeta(list){for(const t of list){if(metaBusy>=3)break;if(META.has(t.mint)||t.score<50)continue;const k=tokens.get(t.mint),u=k&&okUrl(k.uri,IPFS);if(!u){META.set(t.mint,{st:'none'});continue}
-META.set(t.mint,{st:'loading'});metaBusy++;const ac=new AbortController(),to=setTimeout(()=>ac.abort(),6000);
-fetch(u,{signal:ac.signal}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{META.set(t.mint,{st:'ok',tw:okUrl(j.twitter,['x.com','twitter.com']),tg:okUrl(j.telegram,['t.me','telegram.me']),web:okUrl(j.website)})}).catch(()=>META.set(t.mint,{st:'err'})).finally(()=>{clearTimeout(to);metaBusy--})}}
-function smartIn(m){const k=tokens.get(m);if(!k)return 0;let n=0;for(const w of SMART){const p=k.pos[w];if(p&&p.in>0&&p.out<0.5*p.in)n++}return n}
-// Two honest stages: immediate discovery vs. trade-observed evidence (NOT proof of safety).
-const godEarlyPass=t=>ageMs(t.firstSeen)<180000&&ageMs(t.firstSeen)>=0&&t.risk!=='HIGH'&&!t.devSold&&entryInfo(t).l<2;
-const godVerifiedPass=t=>godEarlyPass(t)&&t.score>=70&&(t.risk==='LOW'||t.risk==='MODERATE')&&!(t.snipers>=3&&t.snPct>=0.15)&&t.chg60>0&&t.buyers>=10&&t.tps10>=2&&t.ratio>=1.2;
-const godPass=t=>CH.godTier==='verified'?godVerifiedPass(t):godEarlyPass(t);
-const godStage=t=>godVerifiedPass(t)?3:t.buyers>=4&&t.tps10>=2&&t.score>=35?2:1;
-const godPts=t=>smartIn(t.mint)*2+(t.whale>0?1:0)+((META.get(t.mint)||{}).tw?1:0);
-const GS=(a,b)=>godStage(b)-godStage(a)||godPts(b)-godPts(a)||b.tps10-a.tps10||b.score-a.score||b.firstSeen-a.firstSeen;
-function godHtml(t){const s=smartIn(t.mint),m=META.get(t.mint)||{},o=[];
-if(s)o.push(`<span class="risk r-MODERATE">Watched active wallets: ${s} (not proven skilled)</span>`);
-if(m.tw)o.push(`<a class="chip" href="${esc(m.tw)}" target="_blank" rel="noopener noreferrer">X link</a>`);
-if(m.tg)o.push(`<a class="chip" href="${esc(m.tg)}" target="_blank" rel="noopener noreferrer">Telegram</a>`);
-if(m.web)o.push(`<span class="mu small">site: ${esc(new URL(m.web).hostname)} (unverified, do not connect a wallet)</span>`);
-if(m.st==='ok'&&!m.tw&&!m.tg&&!m.web)o.push('<span class="mu small">no links declared</span>');
-if(CH.god){const stage=godStage(t);o.unshift(`<span class="quick-tag">${stage===3?'MORE TRADE EVIDENCE':stage===2?'EARLY ACTIVITY':'JUST LAUNCHED · UNVERIFIED'}</span>`)}
-return o.length?`<div class="tags" style="margin:0 0 6px">${o.join('')}</div>`:''}
-let acct={start:1,bal:1,day:'',dayStart:1,dayPnl:0,stopped:false},hist=[];
-try{const a=JSON.parse(localStorage.getItem('pv_acct'));if(a&&typeof a.bal==='number')acct=a;const hh=JSON.parse(localStorage.getItem('pv_hist')||'[]');if(Array.isArray(hh))hist=hh}catch{}
-const saveAcct=()=>{try{localStorage.setItem('pv_acct',JSON.stringify(acct));localStorage.setItem('pv_hist',JSON.stringify(hist))}catch{}};
-const toast=s=>{const e=$('#toast');e.textContent=s;e.style.display='block';setTimeout(()=>e.style.display='none',3800)};
-function rollDay(){const d=new Date().toDateString();if(acct.day!==d){acct.day=d;acct.dayStart=acct.bal;acct.dayPnl=0}}
-function practice(mint){rollDay();const t=D.tokens.find(x=>x.mint===mint);if(!t||!t.res)return toast('No live price for this token yet.');
-if(acct.stopped)return toast('Practice trading is stopped. Resume it in My trades.');
-if(acct.dayPnl<=-0.06*acct.dayStart)return toast('Daily practice loss limit (6%) reached. Come back tomorrow.');
-const l=lim(),fee=+$('#fee').value||0,by=l.mx>0&&l.sl>0?l.mx/(l.sl/100):Infinity,sz=Math.min(by,0.1*acct.bal);
-if(!(sz>0)||sz*(1+fee/100)>acct.bal)return toast('Not enough practice balance.');
-acct.bal-=sz*(1+fee/100);mine.unshift({practice:true,mint,name:t.name,sym:t.symbol,at:Date.now(),sol:sz,tk:buyOut(t.res,sz),sl:l.sl||12,tp:l.tp||50,mh:l.mh||15,fee,sc:t.score,hit:null});
-saveMine();saveAcct();view='mine';down=false;render()}
-function closePractice(p,why){if(p.closed)return;const f=p.fee/100,v=mineVal(p)??p.last??p.sol,pr=v*(1-f),cost=p.sol*(1+f),pnl=pr-cost;rollDay();
-acct.bal+=pr;acct.dayPnl+=pnl;p.closed=true;hist.unshift({name:p.name,sym:p.sym,sol:p.sol,fee:p.fee,pnl,ret:pnl/cost,why,held:Date.now()-p.at,sc:p.sc});if(hist.length>300)hist.pop();saveAcct()}
-function stats(){const n=hist.length;if(n<10)return null;const r=hist.map(x=>x.ret).sort((a,b)=>a-b),med=n%2?r[(n-1)/2]:(r[n/2-1]+r[n/2])/2,av=a=>a.reduce((s,x)=>s+x.ret,0)/a.length;
-let eq=0,pk=0,dd=0;for(const x of [...hist].reverse()){eq+=x.pnl;pk=Math.max(pk,eq);dd=Math.max(dd,pk-eq)}
-const hi=hist.filter(x=>x.sc>=70),lo=hist.filter(x=>x.sc<70);
-return{n,wr:hist.filter(x=>x.pnl>0).length/n,avg:av(hist),med,pnl:eq,dd,cost:hist.reduce((s,x)=>s+x.sol*x.fee/100*2,0),hi:hi.length>=5?av(hi):null,lo:lo.length>=5?av(lo):null,nh:hi.length,nl:lo.length}}
-function learnView(){$('#feed').innerHTML=`<div class="lr"><h3>How to read a card</h3><ul><li><b>Score</b> (0 to 100) describes early trading activity: buying pressure, volume, new buyers, spread of holders. It is not a prediction.</li><li><b>Risk</b>: HIGH means a warning was actually seen. UNKNOWN means too little data, and unknown is not safe. LOW only means no red flag was visible in the data this page has.</li><li><b>Since launch</b> and <b>from peak</b> show how late you would be. A token already up a lot is often the last stage of a run.</li><li><b>Fast buyers hold X%</b> means several wallets bought within 3 seconds of launch and now hold a lot. They may be bots or insiders, and they can sell on you.</li></ul>
-<h3>Why beginners lose money here</h3><ul><li>Bots buy in the first seconds. By the time you see a token, you are often buying from them.</li><li>Selling is harder than buying. Prices can fall faster than you can react, and stops are not guaranteed.</li><li>Fees and price impact take a slice of every trade, in and out.</li><li>Chasing a green candle (fear of missing out) and sizing too big are the two most common mistakes.</li></ul>
-<h3>Before any real trade</h3><ul><li>Entry check says no red flags, and the token is not already up a lot.</li><li>You know your size: the most you can lose divided by your stop.</li><li>You decided your stop, target and max time before buying.</li><li>You are using a separate wallet holding only money you can afford to lose.</li><li>You opened Pump.fun yourself from this page's button, not from a link in a message.</li></ul>
-<h3>Protect yourself</h3><ul><li>Never share your seed phrase. No real support person will ask for it.</li><li>Ignore DMs offering signals, airdrops or help recovering funds.</li><li>This site never connects to your wallet and never places trades.</li></ul>
-<h3>Practice first</h3><ul><li>Use the practice account for at least 30 trades and read the results in My trades.</li><li>Practice flatters you: no failed or delayed transactions, no priority fees, no bots front-running you. If you cannot profit in practice, real trading will be harder.</li></ul>
-<h3>What the public data says</h3><p>A CoinGecko analysis of on-chain data found the monthly share of profitable Pump.fun wallets swung between about 30% (June 2025) and about 73% (April 2026). Most profits were small, and it only counts closed trades. Nothing here says a beginner using a scanner will profit.</p></div>`}
-let mine=[],dismissed=new Set(),pinned=null;try{mine=JSON.parse(localStorage.getItem('pv_mine')||'[]')}catch{}
-const saveMine=()=>{try{localStorage.setItem('pv_mine',JSON.stringify(mine))}catch{}};
-const lim=()=>({mx:+$('#mx').value||0,sl:+$('#sl').value||0,tp:+$('#tp').value||0,mh:+$('#mh').value||0});
-const buyOut=(r,dx)=>r.vt-r.vs*r.vt/(r.vs+dx),sellOut=(r,tk)=>r.vs-r.vs*r.vt/(r.vt+tk);
-function helper(t){if(!t.res)return'';const l=lim(),sz=l.mx>0&&l.sl>0?l.mx/(l.sl/100):0;
-let o='<h3 style="margin-top:14px">Trade math</h3><p class="mu small">Math on your own limits, not advice. Fees are not included, and a stop cannot be guaranteed on a bonding curve because the price can jump past it.</p>';
-if(!sz)return o+`<p class="small">Enter the most you can afford to lose, and a stop-loss %, in the Filters panel to see a size.</p><button class="mk" data-prac="${esc(t.mint)}">Practice trade (fake money)</button>`;
-const tk=buyOut(t.res,sz),imp=((t.res.vs+sz)/(t.res.vt-tk))/(t.res.vs/t.res.vt)-1;
-return o+`<p>Size from your limits: <b>${sz.toFixed(3)} SOL</b> (max loss divided by stop).<br>Buying that much moves the price <b>${pc(imp)}</b>, so your average fill is worse than the quote.<br>At your stop (${l.sl}%) you would lose about ${(sz*l.sl/100).toFixed(3)} SOL. At your target (${l.tp}%) you would gain about ${(sz*l.tp/100).toFixed(3)} SOL. Max hold: ${l.mh} min.</p><button class="mk" data-prac="${esc(t.mint)}">Practice trade (fake money)</button><button class="mk" style="background:var(--bg);color:var(--tx);border:1px solid var(--ln)" data-track="${esc(t.mint)}">I bought this for real: track it</button>`}
-function track(mint){const t=D.tokens.find(x=>x.mint===mint),l=lim(),sz=l.mx>0&&l.sl>0?l.mx/(l.sl/100):0;if(!t||!t.res||!sz)return;
-mine.unshift({mint,name:t.name,sym:t.symbol,at:Date.now(),sol:sz,tk:buyOut(t.res,sz),sl:l.sl,tp:l.tp,mh:l.mh,hit:null});saveMine();view='mine';down=false;render()}
-function mineVal(p){const k=tokens.get(p.mint),r=k&&k.res;if(!r)return null;const r2={vs:r.vs+p.sol,vt:r.vt-p.tk};return r2.vt>0?sellOut(r2,p.tk):null} // exit value as if your buy were in the curve
-function checkMine(){let ch=false;for(const p of mine){if(p.hit)continue;const v=mineVal(p),held=(Date.now()-p.at)/60000;let x=null;
-if(v!=null){p.last=v;const pl=v/p.sol-1;if(p.sl&&pl<=-p.sl/100)x='STOP';else if(p.tp&&pl>=p.tp/100)x='TARGET'}
-if(!x&&p.mh&&held>=p.mh)x='TIME';if(x){p.hit=x;ch=true;if(p.practice)closePractice(p,x)}}
-if(ch){saveMine();if($('#snd').checked)beep();pin()}}
-function mineView(){rollDay();$('#n1').textContent=D.tokens.length;$('#n2').textContent=D.tokens.filter(t=>t.score>=70).length;
-const rows=mine.map((p,i)=>{if(p.closed)return'';const v=mineVal(p),pl=v==null?null:v/p.sol-1;
-return `<article class="wc"><div class="hd"><b>${esc(p.name||'Unnamed')} <span class="mu">$${esc(p.sym)}</span> ${p.practice?'<span class="risk r-LOW">PRACTICE</span>':'<span class="risk r-MODERATE">TRACKED</span>'}</b><span class="age">${fmt(Date.now()-p.at)}</span></div>
-<p>${p.sol.toFixed(3)} SOL in. ${pl==null?'No live price.':`Estimated now: <b class="${pl>=0?'buy':'sell'}">${pc(pl)}</b> (${v-p.sol>=0?'+':''}${(v-p.sol).toFixed(3)} SOL, before fees)`}</p>
-<p class="mu small">Stop ${p.sl}%, target ${p.tp}%, max hold ${p.mh} min${p.hit&&!p.practice?`. <b class="${p.hit==='TARGET'?'buy':'sell'}">${p.hit==='TARGET'?'Target reached':p.hit==='STOP'?'Stop level reached':'Max hold time reached'}</b>`:''}</p>
-<a class="open" href="https://pump.fun/coin/${esc(p.mint)}" target="_blank" rel="noopener noreferrer">OPEN ON PUMP.FUN</a><div class="mini">${p.practice?`<button data-close="${i}">Close now</button>`:`<button data-rm="${i}">Remove</button>`}</div></article>`}).join('');
-const s=stats(),lim6=acct.dayPnl<=-0.06*acct.dayStart,sg=x=>(x>=0?'+':'')+x.toFixed(3);
-const st=s?`<p class="small">${s.n} closed practice trades. Win rate <b>${(s.wr*100).toFixed(0)}%</b> (a win is a profit after assumed fees). Average <b>${pc(s.avg)}</b>, median <b>${pc(s.med)}</b>. Total <b>${sg(s.pnl)} SOL</b>, biggest drop ${s.dd.toFixed(3)} SOL, assumed fees paid ${s.cost.toFixed(3)} SOL.<br>By score at entry: 70 and above ${s.hi==null?`not enough trades (${s.nh})`:`${pc(s.hi)} average over ${s.nh}`}; below 70 ${s.lo==null?`not enough trades (${s.nl})`:`${pc(s.lo)} average over ${s.nl}`}. Small samples are noisy.</p>`:`<p class="mu small">Not enough data: ${hist.length} of 10 closed practice trades.</p>`;
-const cl=hist.slice(0,10).map(x=>`<div class="tr"><span>${esc(x.name||'?')}</span><span class="${x.pnl>=0?'buy':'sell'}">${pc(x.ret)}</span><span class="mu">${esc(x.why)}</span><span class="mu">${fmt(x.held)}</span></div>`).join('');
-$('#feed').innerHTML=`<h3>Practice account (fake money)</h3><div class="stats"><div><small>Balance</small>${acct.bal.toFixed(3)} SOL</div><div><small>Start</small>${acct.start.toFixed(2)}</div><div><small>Today</small>${sg(acct.dayPnl)}</div><div><small>Day limit</small>${lim6?'<b class="sell">reached</b>':'OK'}</div></div>
-<div class="mini"><button data-acct="stop">${acct.stopped?'Resume practice trading':'Emergency stop'}</button><button data-acct="reset">Reset account</button></div>
-<p class="mu small">Limits come from your original spec: each practice trade is at most 10% of the balance, and new trades stop after a 6% loss in a day. Practice is friendlier than real trading: no failed transactions, no priority fees, no bots front-running you.</p>${st}${cl?`<h3>Recent closed</h3>${cl}`:''}
-<h3>Open and tracked trades</h3><p class="mu small">Tracked means a real trade you made yourself. This page never places orders. It follows the bonding-curve price from the moment you tap and alerts you at your stop, target or time limit.</p>${rows||'<div class="empty">Nothing open. Select a token, then tap Practice trade.</div>'}`}
-function pin(){if(down)return;const el=$('#pin');let html='';const hit=mine.find(p=>p.hit&&!p.ack);
-if(hit)html=`<div class="pinbox ${hit.hit==='TARGET'?'':'bad'}"><b>${hit.practice?'Practice: ':''}${esc(hit.name||'Your trade')}: ${hit.hit==='TARGET'?'target reached':hit.hit==='STOP'?'stop level reached':'max hold time reached'}</b><a class="open" href="https://pump.fun/coin/${esc(hit.mint)}" target="_blank" rel="noopener noreferrer">OPEN ON PUMP.FUN</a><button data-ack="${mine.indexOf(hit)}">Dismiss</button></div>`;
-else{let cur=pinned&&D.tokens.find(t=>t.mint===pinned&&!dismissed.has(t.mint)&&t.risk!=='HIGH');
-const best=D.tokens.filter(t=>t.score>=F.aS&&(t.risk==='LOW'||t.risk==='MODERATE')&&!dismissed.has(t.mint)).sort((a,b)=>b.score-a.score)[0];
-if(!cur||(best&&best.mint!==cur.mint&&best.score>=cur.score+10))cur=best||null;pinned=cur?cur.mint:null;
-if(cur)html=`<div class="pinbox"><b>${esc(cur.name||'Unnamed')} $${esc(cur.symbol)}</b><span>score ${cur.score}, risk ${cur.risk}, ${fmt(ageMs(cur.firstSeen))} old, ${pc(cur.since)} since launch</span><a class="open" href="https://pump.fun/coin/${esc(cur.mint)}" target="_blank" rel="noopener noreferrer">OPEN ON PUMP.FUN</a><button data-dis="${esc(cur.mint)}">Dismiss</button></div>`}
-if(el.innerHTML!==html)el.innerHTML=html}
-function beep(){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=880;g.gain.value=.15;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.18)}
-function alerts(l){const quiet=!ready;if(D.now)ready=true;let hit=false;for(const t of l){if(t.score>=F.aS&&!al.has(t.mint)){al.add(t.mint);if(!quiet){hit=true;newTill[t.mint]=Date.now()+10000}}}
-if(wHit){hit=true;wHit=0}if(hit){const hd=$('header');hd.style.background='#143d24';setTimeout(()=>hd.style.background='',900);if(F.snd)beep()}}
-function render(){if(down)return;readF();SMART=new Set([...WB.map(r=>r.w),...watch]);wantMeta([...D.tokens].sort((a,b)=>b.score-a.score).slice(0,30));const l=D.tokens.filter(pass).sort(CH.god?GS:(SORTS[F.sort]||SORTS.score));alerts(l);pin();document.querySelectorAll('#tabs button').forEach(b=>b.style.borderColor=b.dataset.v===view?'var(--bl)':'');$('#wbar').style.display=view==='wallets'?'block':'none';$('#chips').innerHTML=view==='tokens'?chipsHtml():'';if(view==='wallets'){walletView();return}if(view==='mine'){mineView();return}if(view==='learn'){learnView();return}$('#feed').innerHTML=l.length?`${CH.god?`<div class="fast-heading"><strong>⚡ ${CH.godTier==='early'?'GOD MODE · EARLY RADAR':'GOD MODE · MORE EVIDENCE'}</strong><span class="mu small">${l.length} matches · newest seen immediately; no guaranteed winning trades</span></div>`:''}<p class="mu small" style="margin:0 0 8px">Showing ${l.length} of ${D.tokens.length} tokens from the last 5 minutes</p>`+l.slice(0,CH.god?70:130).map(card).join(''):`<div class="empty">${D.status==='live'?`${CH.god?'No coins match this GOD MODE stage yet. Early Radar displays launches; More Evidence requires live paid trade data.':'No tokens match your filters yet. Tap Reset above or loosen the Filters panel.'} ${D.tokens.length} scanned in the last 5 minutes.`:'Waiting for the live stream.'}</div>`;$('#n1').textContent=D.tokens.length;$('#n2').textContent=D.tokens.filter(t=>t.score>=70).length;$('#faststat').textContent='3-minute radar: '+D.tokens.filter(godEarlyPass).length;detail()}
-function walletBubbles(mint){const raw=tokens.get(mint);const v=raw?Object.entries(raw.balances).filter(([w,bal])=>okAddr(w)&&Number.isFinite(bal)&&bal>0).sort((a,b)=>b[1]-a[1]).slice(0,24):[];
-const legend='<div class="bubble-legend"><span><i class="bubble-dot" style="background:#ffb84d"></i>Creator</span><span><i class="bubble-dot" style="background:#bd89ff"></i>First 3s buyer</span><span><i class="bubble-dot" style="background:#42aaf5"></i>Other observed wallet</span></div>';
-const intro='<p class="bubble-explain">These bubbles show <b>observed token balances from live trades in this page</b>. Circle size indicates relative observed balance. The map is incomplete and shows NO transfer links or confirmed wallet clusters. This is not a full Bubblemaps risk scan.</p>';
-const action=`<div class="mini"><button data-copy="${esc(mint)}">Copy token address</button><a href="https://v2.bubblemaps.io/?chain=solana" target="_blank" rel="noopener noreferrer">Open Bubblemaps V2</a></div><p class="micro">For full holder/transfer analysis, paste this token address into Bubblemaps. Brand-new tokens may not be indexed yet.</p>`;
-if(!v.length)return `<div class="bubble-wrap"><h3>Wallet bubble map (observed only)</h3><p class="mu small">No wallet balances observed yet. A live keyed trade feed is needed for useful data; the launch stream alone is insufficient.</p>${action}</div>`;
-const max=v[0][1],placed=[];let circles='';
-for(let i=0;i<v.length;i++){const[w,bal]=v[i];const r=Math.max(6,Math.min(32,6+25*Math.sqrt(bal/max))),col=w===raw.creator?'#ffb84d':raw.snipers.has(w)?'#bd89ff':'#42aaf5';let pos=null;
-for(let j=0;j<1200;j++){const a=(j*0.53+i*0.7),d=4+Math.sqrt(j)*5.4,x=165+Math.cos(a)*d,y=120+Math.sin(a)*d*.67;if(x-r<4||x+r>326||y-r<4||y+r>236)continue;if(placed.every(q=>Math.hypot(x-q.x,y-q.y)>r+q.r+2)){pos={x,y,r};break}}
-if(!pos)continue;placed.push(pos);const role=w===raw.creator?'Creator':raw.snipers.has(w)?'First 3s buyer':'Observed wallet';
-circles+=`<circle data-bwallet="${esc(w)}" tabindex="0" role="button" aria-label="${esc(role)} ${esc(short(w))}" cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="${r.toFixed(1)}" fill="${col}"><title>${esc(role)}: ${esc(short(w))}, ${bal.toLocaleString('en-US',{maximumFractionDigits:0})} tokens observed</title></circle>`}
-return `<div class="bubble-wrap"><h3>Wallet bubble map · ${placed.length} observed</h3><svg viewBox="0 0 330 240" aria-label="Observed holder bubble map, not verified on-chain clusters">${circles}</svg>${legend}${intro}<p class="micro" id="bubbleInfo">Click a bubble to see its wallet.</p>${action}</div>`}
-function detail(){const t=D.tokens.find(x=>x.mint===sel),el=$('#detail');
-if(!sel){el.innerHTML='<h3>Token details</h3><p class="mu">Select a token to see its score breakdown, risk reasons and recent trades.</p>';return}
-if(!t){el.innerHTML='<h3>Token details</h3><p class="mu">This token is older than 5 minutes and has left the scanner.</p>';return}
-const s=t.series,mn=Math.min(...s),mx=Math.max(...s),pts=s.length>1?s.map((p,i)=>`${i/(s.length-1)*300},${68-(mx>mn?(p-mn)/(mx-mn)*64:32)}`).join(' '):'';
-el.innerHTML=`<h3>${esc(t.name)} <span class="mu">$${esc(t.symbol)}</span></h3><svg viewBox="0 0 300 70" width="100%" height="70" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="var(--gr)" stroke-width="1.5"/></svg><p class="mu small">Price on the bonding curve since first detection.</p>
-<p>${esc(t.explain)}</p>${t.parts.map(p=>`<div class="bar"><span>${NAMES[p.k]}</span><span>${p.pts}/${p.max}</span></div><div class="track"><div style="width:${p.pts/p.max*100}%"></div></div>`).join('')}
-${walletBubbles(t.mint)}${helper(t)}<h3 style="margin-top:14px">Risk: <span class="r-${t.risk}">${t.risk}</span></h3>${t.reasons.length?t.reasons.map(r=>`<div class="why ${r.kind}"><b>${r.kind==='confirmed'?'Observed risk':'Warning'}:</b> ${esc(r.text)}</div>`).join(''):'<p class="mu small">No red flags in the data available.</p>'}
-<p class="mu small">Not checked in this version: ${t.unverified.map(esc).join('; ')}. Unchecked is not the same as safe.</p>
-<h3 style="margin-top:14px">Recent trades</h3>${t.recent.map(r=>`<div class="tr"><span class="${r.side}">${r.side}</span><span>${r.sol.toFixed(2)} SOL</span><span class="mu">${esc(r.who)}</span><span class="mu">${Math.round(r.ago/1000)}s ago</span></div>`).join('')||'<p class="mu small">No trades yet.</p>'}`}
-function bar(){const stale=Date.now()-got,q=(D.now-D.lastMsg+stale)/1000;let c,m;
-if(!sseOk||stale>4000)[c,m]=['bad','Page paused'];else if(D.status!=='live')[c,m]=['bad','Stream disconnected'];else if(!D.lastMsg||q>20)[c,m]=['warn','Stream quiet'];else[c,m]=['ok',tradeApiKey?(tradeMsgCount?'Trade data active':'Awaiting trade events'):'Launch feed only'];
-$('#st').className='pill '+c;$('#st').textContent=m;$('#lat').textContent=D.lastMsg?`Last stream message ${Math.round(q)}s ago`:''}
-$('#feed').addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(b){navigator.clipboard.writeText(b.dataset.copy).then(()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy mint',1200)}).catch(()=>{b.textContent='Copy failed'});return}
-const ac2=e.target.closest('[data-acct]');if(ac2){if(ac2.dataset.acct==='stop')acct.stopped=!acct.stopped;else if(confirm('Reset your practice account and history?')){const bl=+$('#pb').value||1;acct={start:bl,bal:bl,day:'',dayStart:bl,dayPnl:0,stopped:false};hist=[];mine=mine.filter(p=>!p.practice);saveMine()}saveAcct();down=false;render();return}
-const cl=e.target.closest('[data-close]');if(cl){const p=mine[+cl.dataset.close];if(p&&p.practice&&!p.closed){p.hit='MANUAL';p.ack=true;closePractice(p,'MANUAL');saveMine()}down=false;render();return}
-const rm=e.target.closest('[data-rm]');if(rm){mine.splice(+rm.dataset.rm,1);saveMine();down=false;render();return}const wbtn=e.target.closest('[data-w]');if(wbtn){toggleWatch(wbtn.dataset.w);return}const bub=e.target.closest('[data-bubbles]');if(bub){sel=bub.dataset.bubbles;down=false;render();$('#detail').scrollIntoView({behavior:'smooth'});return}if(e.target.closest('a'))return;const c=e.target.closest('.card');if(c){sel=c.dataset.m;down=false;render();if(innerWidth<1000)$('#detail').scrollIntoView({behavior:'smooth'})}});
-document.querySelectorAll('aside input,aside select').forEach(i=>i.addEventListener('input',()=>{down=false;ready=false;render()}));
-addEventListener('pointerdown',()=>down=true);['pointerup','pointercancel'].forEach(ev=>addEventListener(ev,()=>setTimeout(()=>down=false,60)));
-setInterval(()=>{document.querySelectorAll('.age').forEach(a=>a.textContent=fmt(ageMs(+a.dataset.f)));bar()},1000);
-// ---- live engine: runs entirely in this page ----
-const WS_URL='wss://pumpportal.fun/api/data',MAX_AGE=300000,KEEP=1200000,MINT_RE=/^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-const tokens=new Map(),stt={status:'connecting',lastMsg:0};const wb=new Map(),done=new Map(),seenSig=new Set();
-let ws,attempt=0,connectionSeq=0,retryTimer=null,tradeApiKey='',tradeMsgCount=0;
-const subscribedTokens=new Map(),MAX_TRADE_SUBS=80; // cap metered token streams
-const wsend=o=>ws&&ws.readyState===1&&ws.send(JSON.stringify(o));
-const okAddr=a=>typeof a==='string'&&MINT_RE.test(a);
-function connect(){
- const seq=++connectionSeq;if(retryTimer){clearTimeout(retryTimer);retryTimer=null}
- if(ws){ws.onclose=null;ws.onmessage=null;ws.onerror=null;try{ws.close()}catch{}}
- subscribedTokens.clear();tradeMsgCount=0;stt.status='connecting';
- const addr=tradeApiKey?WS_URL+'?api-key='+encodeURIComponent(tradeApiKey):WS_URL;
- try{ws=new WebSocket(addr)}catch{stt.status='disconnected';retryTimer=setTimeout(connect,3000);return}
- const sock=ws;
- sock.onopen=()=>{if(seq!==connectionSeq)return;attempt=0;stt.status='live';wsend({method:'subscribeNewToken'});
- if(tradeApiKey){if(watch.size)wsend({method:'subscribeAccountTrade',keys:[...watch]});
- const active=[...tokens.values()].filter(t=>Date.now()-t.firstSeen<180000).sort((a,b)=>b.firstSeen-a.firstSeen).slice(0,MAX_TRADE_SUBS).reverse();for(const t of active)subscribeTrades(t.mint)};
- updateKeyStatus()};
- sock.onmessage=e=>{if(seq!==connectionSeq)return;stt.lastMsg=Date.now();let m;try{m=JSON.parse(e.data)}catch{return}if(m.txType==='buy'||m.txType==='sell')tradeMsgCount++;handle(m)};
- sock.onclose=()=>{if(seq!==connectionSeq)return;stt.status='disconnected';updateKeyStatus();retryTimer=setTimeout(connect,Math.min(30000,1000*2**attempt++)+Math.random()*500)};
- sock.onerror=()=>{stt.status='disconnected';updateKeyStatus()};
- updateKeyStatus();
-}
-function updateKeyStatus(){const k=$('#keyStatus');if(!k)return;k.textContent=tradeApiKey?`API key active in memory only. ${stt.status==='live'?`Requested trade subscriptions; ${tradeMsgCount} buy/sell events received.`:'Connecting to keyed stream…'} ${subscribedTokens.size}/${MAX_TRADE_SUBS} token streams; usage may incur SOL fees.`:'Launch-only mode: new coins show up, but trade evidence and meaningful wallet bubbles need a PumpPortal data API key.'}
-function unsubscribeTrades(mint){if(!subscribedTokens.has(mint))return;subscribedTokens.delete(mint);wsend({method:'unsubscribeTokenTrade',keys:[mint]})}
-function subscribeTrades(mint){if(!tradeApiKey||!okAddr(mint)||subscribedTokens.has(mint)||!ws||ws.readyState!==1)return;
- if(subscribedTokens.size>=MAX_TRADE_SUBS){const oldest=subscribedTokens.keys().next().value;if(oldest)unsubscribeTrades(oldest)}
- subscribedTokens.set(mint,Date.now());wsend({method:'subscribeTokenTrade',keys:[mint]})}
-function fresh(m){if(!m.signature)return true;if(seenSig.has(m.signature))return false;seenSig.add(m.signature);if(seenSig.size>30000)seenSig.clear();return true}
-function recordBuy(w,mint,at,sol,px){const a=wb.get(w)||[];a.unshift({mint,at,sol,px});if(a.length>30)a.pop();wb.set(w,a);if(watch.has(w)&&ready)wHit++}
-function handle(m){if(!m||!okAddr(m.mint))return;const now=Date.now();
-if(m.txType==='create'){if(tokens.has(m.mint))return;if(m.signature)seenSig.add(m.signature);const t={mint:m.mint,name:String(m.name||'').slice(0,40),symbol:String(m.symbol||'').slice(0,12),creator:m.traderPublicKey,firstSeen:now,trades:[],balances:{},prices:[],mcSol:null,pos:{},rk:0,snipers:new Set(),uri:String(m.uri||'').slice(0,300)};
-tokens.set(m.mint,t);subscribeTrades(m.mint);push(t,{...m,txType:'buy',newTokenBalance:m.initialBuy},now,Number(m.solAmount)>0)}
-else if(m.txType==='buy'||m.txType==='sell'){if(!fresh(m))return;const t=tokens.get(m.mint);if(t)push(t,m,now,true);else if(m.txType==='buy'&&okAddr(m.traderPublicKey)&&watch.has(m.traderPublicKey)){const vs=Number(m.vSolInBondingCurve),vt=Number(m.vTokensInBondingCurve);recordBuy(m.traderPublicKey,m.mint,now,Number(m.solAmount)||0,vs>0&&vt>0?vs/vt:null)}}queueSnapshot()}
-function push(t,m,now,isTrade){const w=okAddr(m.traderPublicKey)?m.traderPublicKey:null,vs=Number(m.vSolInBondingCurve),vt=Number(m.vTokensInBondingCurve),px=vs>0&&vt>0?vs/vt:null;
-if(isTrade){const sol=Number(m.solAmount)||0;t.trades.push({t:now,side:m.txType,sol,who:m.traderPublicKey});if(t.trades.length>3000)t.trades.shift();
-if(w){const p=t.pos[w]||(t.pos[w]={in:0,out:0,bal:0,rank:0});if(m.txType==='buy'){p.in+=sol;if(!p.rank)p.rank=++t.rk;if(w!==t.creator&&now-t.firstSeen<=3000)t.snipers.add(w);recordBuy(w,t.mint,now,sol,px)}else p.out+=sol}}
-if(w&&m.newTokenBalance!=null){const bl=Number(m.newTokenBalance)||0;t.balances[w]=bl;if(t.pos[w])t.pos[w].bal=bl}
-if(px){t.prices.push({t:now,p:px});t.res={vs,vt};if(t.prices.length>600)t.prices.shift()}
-if(m.marketCapSol!=null)t.mcSol=Number(m.marketCapSol)}
-function finish(t){const px=t.prices.length?t.prices[t.prices.length-1].p:0;for(const w in t.pos){const p=t.pos[w];if(w===t.creator||p.in<=0)continue;const pnl=p.out+p.bal*px-p.in,d=done.get(w)||{n:0,wins:0,pnl:0,early:0};d.n++;if(pnl>0)d.wins++;d.pnl+=pnl;if(p.rank&&p.rank<=10)d.early++;done.set(w,d)}}
-function board(){const agg=new Map(),add=(w,d)=>{const a=agg.get(w)||{n:0,wins:0,pnl:0,early:0};a.n+=d.n;a.wins+=d.wins;a.pnl+=d.pnl;a.early+=d.early;agg.set(w,a)};
-for(const[w,d]of done)add(w,d);
-for(const t of tokens.values()){const px=t.prices.length?t.prices[t.prices.length-1].p:0;for(const w in t.pos){const p=t.pos[w];if(w===t.creator||p.in<=0)continue;const pnl=p.out+p.bal*px-p.in;add(w,{n:1,wins:pnl>0?1:0,pnl,early:p.rank&&p.rank<=10?1:0})}}
-const rows=[];for(const[w,a]of agg)if(a.n>=3&&a.pnl>0&&a.wins/a.n>=0.6)rows.push({w,...a,wr:a.wins/a.n});return rows.sort((x,y)=>y.pnl-x.pnl)}
-function snapshot(){const now=Date.now(),out=[];
- for(const t of tokens.values()){const a=now-t.firstSeen;
- if(a>KEEP){finish(t);tokens.delete(t.mint);unsubscribeTrades(t.mint)}
- else if(a<=MAX_AGE)out.push(analyze(t,now))}
- for(const mint of subscribedTokens.keys()){const t=tokens.get(mint),tracked=mine.some(p=>p.mint===mint&&!p.hit);if(!t||(!tracked&&now-t.firstSeen>180000))unsubscribeTrades(mint)}
- out.sort((a,b)=>b.score-a.score);D={status:stt.status,now,lastMsg:stt.lastMsg,tokens:out};got=Date.now();sseOk=true;render();bar();updateKeyStatus()}
- let rapidTimer=null;function queueSnapshot(){if(rapidTimer)return;rapidTimer=setTimeout(()=>{rapidTimer=null;snapshot()},180)}
- setInterval(snapshot,1000);
-setInterval(()=>{WB=board();const now=Date.now();for(const[w,a]of wb)if(now-a[0].at>1800000&&!watch.has(w))wb.delete(w)},3000);
-connect();
-$('#connectKey').onclick=()=>{const key=$('#apiKey').value.trim();if(key.length<10||/\s/.test(key)){toast('Enter your PumpPortal DATA API key, never a wallet secret.');return}tradeApiKey=key;$('#apiKey').value='';connect();toast('Requesting paid trade data. Monitor the stream status.')};
-$('#disconnectKey').onclick=()=>{tradeApiKey='';$('#apiKey').value='';connect();toast('Switched to free launch-only feed.')};
-const PRE={all:{score:0,buyers:0,ratio:0,hide:false},quick:{score:40,buyers:5,ratio:1,hide:false},strict:{score:70,buyers:10,ratio:1.5,hide:true}};
-function preset(k){const p=PRE[k];$('#score').value=p.score;$('#buyers').value=p.buyers;$('#ratio').value=p.ratio;$('#hide').checked=p.hide;$('#age').value='0-300';$('#net').value=0;$('#top').value=100;down=false;ready=false;render()}
-document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{view=b.dataset.v;down=false;render()});
-$('#detail').addEventListener('click',e=>{const w=e.target.closest('[data-bwallet]');if(w){const raw=tokens.get(sel),addr=w.dataset.bwallet,bal=raw?.balances[addr]||0,role=addr===raw?.creator?'Creator':raw?.snipers.has(addr)?'Bought within first 3s':'Observed wallet';const inf=$('#bubbleInfo');if(inf)inf.textContent=`${short(addr)} · ${role} · ${Number(bal).toLocaleString()} observed tokens. This does not prove wallet connections.`;return}
-const copy=e.target.closest('[data-copy]');if(copy){navigator.clipboard.writeText(copy.dataset.copy).then(()=>toast('Token address copied')).catch(()=>toast('Could not copy address'));return}
-const q=e.target.closest('[data-prac]');if(q){practice(q.dataset.prac);return}const b=e.target.closest('[data-track]');if(b)track(b.dataset.track)});
-$('#detail').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-bwallet]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
-$('#pin').addEventListener('click',e=>{const d=e.target.closest('[data-dis]');if(d){dismissed.add(d.dataset.dis);down=false;pin();return}const a=e.target.closest('[data-ack]');if(a){mine[+a.dataset.ack].ack=true;saveMine();down=false;pin()}});
-setInterval(checkMine,1000);
-$('#chips').addEventListener('click',e=>{const r=e.target.closest('[data-r]'),q=e.target.closest('[data-q]'),s=e.target.closest('[data-s]'),x=e.target.closest('[data-reset]'),tier=e.target.closest('[data-god-tier]');
-if(e.target.closest('[data-god]'))CH.god=!CH.god;else if(tier)CH.godTier=tier.dataset.godTier;else if(r)CH.risk[r.dataset.r]=CH.risk[r.dataset.r]?0:1;else if(q)CH.q[q.dataset.q]=CH.q[q.dataset.q]?0:1;else if(s)$('#sort').value=s.dataset.s;else if(x){CH={risk:{LOW:1,MODERATE:1,HIGH:1,UNKNOWN:1},q:{}};$('#sort').value='score'}else if(!e.target.closest('[data-god]'))return;
-saveChips();down=false;render()});
-try{if(!localStorage.getItem('pv_ack'))$('#ack').style.display='flex'}catch{}
-$('#ackBtn').onclick=()=>{try{localStorage.setItem('pv_ack','1')}catch{}$('#ack').style.display='none'};
-$('#wAdd').onclick=()=>{const v=$('#wIn').value.trim();if(!MINT_RE.test(v)){$('#wMsg').textContent='That does not look like a Solana wallet address.';return}$('#wMsg').textContent='';$('#wIn').value='';if(!watch.has(v))toggleWatch(v)};
-$('#pAll').onclick=()=>preset('all');$('#pQuick').onclick=()=>preset('quick');$('#pStrict').onclick=()=>preset('strict');
-$('#snd').addEventListener('change',()=>{if($('#snd').checked){ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume();beep()}});
-if(innerWidth<1000)$('details').open=false;
-render();bar();
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=x=>String(x??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const validAddr=s=>typeof s==='string'&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s);
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,Number.isFinite(v)?v:0));
+const now=()=>Date.now(),age=t=>Math.max(0,now()-t.firstSeen),fmtAge=ms=>{const n=Math.floor(ms/1000);return `${Math.floor(n/60)}:${String(n%60).padStart(2,'0')}`};
+const money=(x,d=2)=>Number.isFinite(x)?x.toFixed(d):'—';
+const short=w=>w&&w.length>12?w.slice(0,5)+'…'+w.slice(-5):String(w||'?');
+const pct=x=>(x>=0?'+':'')+Math.round(x*100)+'%';
+const safePostId=s=>/^\d{1,22}$/.test(String(s))?String(s):null;
+const xSearch=mint=>'https://x.com/search?q='+encodeURIComponent(mint)+'&f=live';
+const MINT_TOTAL=1e9, MAX_TOKENS=250, TOKEN_TTL=8*60*1000,TRADE_LIMIT=320;
+const tokens=new Map(),walletBuys=new Map(),xCoins=new Map(),subs=new Map();
+let ws=null,wsGeneration=0,retry=0,retryTimer=null,tradeKey='',traffic=0,lastStream=0,conn='connecting';
+let currentTab='radar',radarMode='early',selected=null,paused=false,dirty=new Set(),frameTimer=null,lastRender=0,navForce=true,latestList=[],lastUiTick=0;
+let workerBase='',workerTimer=null,workerBusy=false,xLast=0,xState='off',xError='',sounds=false,audioCtx=null,alertsSeen=new Set();
+let paper=[],closed=[],account={start:1,bal:1,day:'',dayStart:1,pnlDay:0,stopped:false};
+let watch=new Set();try{watch=new Set((JSON.parse(localStorage.getItem('pv_watch')||'[]')||[]).filter(validAddr))}catch{}
+try{const a=JSON.parse(localStorage.getItem('pv_acct')||'null');if(a&&Number.isFinite(a.bal)&&a.bal>=0){account={...account,...a};account.pnlDay=Number(a.dayPnl??a.pnlDay??0)}}catch{}
+try{const v=JSON.parse(localStorage.getItem('pv_mine')||'[]');if(Array.isArray(v))paper=v.filter(x=>x&&typeof x.mint==='string'&&!x.closed&&x.practice).slice(0,80)}catch{}
+try{const v=JSON.parse(localStorage.getItem('pv_hist')||'[]');if(Array.isArray(v))closed=v.slice(0,150)}catch{}
+try{workerBase=localStorage.getItem('pvt_worker')||''}catch{}
+const toast=message=>{const el=$('#toast');el.textContent=message;el.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.display='none',4000)};
+const savePaper=()=>{try{localStorage.setItem('pv_acct',JSON.stringify({...account,dayPnl:account.pnlDay}));localStorage.setItem('pv_mine',JSON.stringify(paper));localStorage.setItem('pv_hist',JSON.stringify(closed))}catch{}};
+const saveWatch=()=>{try{localStorage.setItem('pv_watch',JSON.stringify([...watch]))}catch{}};
+function newToken(m,t){const raw={mint:m.mint,name:String(m.name||'Unnamed').slice(0,45),symbol:String(m.symbol||'').slice(0,14),creator:validAddr(m.traderPublicKey)?m.traderPublicKey:null,firstSeen:t,rev:1,lastTrade:t,trades:[],wallets:new Map(),snipers:new Set(),prices:[],res:null,cap:null,buys:0,sells:0,solBuy:0,solSell:0,devSold:false,firstPrice:null,peak:0,tradeObserved:false};tokens.set(m.mint,raw);return raw}
+function record(t,m,when,launch=false){const k=m.txType,w=validAddr(m.traderPublicKey)?m.traderPublicKey:null,sol=Number(m.solAmount)||0; if(!(k==='buy'||k==='sell')||sol<0||!Number.isFinite(sol))return;
+ if(launch&&!sol)return;const ev={ts:when,side:k,sol,who:w};t.trades.push(ev);if(t.trades.length>TRADE_LIMIT)t.trades.shift();t.buys+=k==='buy'?1:0;t.sells+=k==='sell'?1:0;t.solBuy+=k==='buy'?sol:0;t.solSell+=k==='sell'?sol:0;
+ if(w){if(k==='sell'&&w===t.creator)t.devSold=true;if(k==='buy'&&w!==t.creator&&when-t.firstSeen<3000)t.snipers.add(w);
+ const p=t.wallets.get(w)||{balance:null,in:0,out:0};if(k==='buy')p.in+=sol;else p.out+=sol;
+ if(m.newTokenBalance!==undefined&&Number.isFinite(Number(m.newTokenBalance)))p.balance=Math.max(0,Number(m.newTokenBalance));else if(launch&&w===t.creator&&Number.isFinite(Number(m.initialBuy)))p.balance=Math.max(0,Number(m.initialBuy));t.wallets.set(w,p);
+ if(k==='buy'&&watch.has(w)){const a=walletBuys.get(w)||[];a.unshift({mint:t.mint,when,sol});if(a.length>10)a.pop();walletBuys.set(w,a)}}
+ const vs=Number(m.vSolInBondingCurve),vt=Number(m.vTokensInBondingCurve);if(vs>0&&vt>0){const p=vs/vt;t.res={vs,vt};t.prices.push({ts:when,p});if(t.prices.length>125)t.prices.shift();t.firstPrice??=p;t.peak=Math.max(t.peak,p)}
+ if(Number.isFinite(Number(m.marketCapSol)))t.cap=Number(m.marketCapSol);t.lastTrade=when;t.rev++;t.tradeObserved=!launch||t.tradeObserved;dirty.add(t.mint)}
+let seen=new Set();function handleEvent(m){if(!m||!validAddr(m.mint))return;lastStream=now();const type=m.txType,signature=typeof m.signature==='string'?m.signature:'';if(signature){if(seen.has(signature))return;seen.add(signature);if(seen.size>9000)seen=new Set([...seen].slice(-5000))}
+ const t=now();if(type==='create'){if(tokens.has(m.mint))return;const raw=newToken(m,t);if(Number(m.solAmount)>0)record(raw,{...m,txType:'buy',newTokenBalance:m.initialBuy},t,true);
+ dirty.add(m.mint);if(tradeKey)subscribeMint(m.mint);requestUi(true);return}
+ if(type==='buy'||type==='sell'){traffic++;const raw=tokens.get(m.mint);if(raw){record(raw,m,t,false);requestUi(false)}else if(type==='buy'&&watch.has(m.traderPublicKey)){const a=walletBuys.get(m.traderPublicKey)||[];a.unshift({mint:m.mint,when:t,sol:Number(m.solAmount)||0});walletBuys.set(m.traderPublicKey,a);if(currentTab==='watch')requestUi()}}}
+const send=obj=>{if(ws&&ws.readyState===1){ws.send(JSON.stringify(obj));return true}return false};
+function connect(){const seq=++wsGeneration;clearTimeout(retryTimer);try{if(ws){ws.onclose=null;ws.onmessage=null;ws.close()}}catch{}subs.clear();conn='connecting';updateHeader();const url='wss://pumpportal.fun/api/data'+(tradeKey?'?api-key='+encodeURIComponent(tradeKey):'');
+ try{ws=new WebSocket(url)}catch{conn='offline';retryTimer=setTimeout(connect,2000);return}const sock=ws;
+ sock.onopen=()=>{if(seq!==wsGeneration)return;retry=0;conn='connected';send({method:'subscribeNewToken'});if(tradeKey){const active=[...tokens.values()].filter(t=>age(t)<70000).sort((a,b)=>b.firstSeen-a.firstSeen).slice(0,Number($('#subCap').value));for(const t of active)subscribeMint(t.mint);if(watch.size)send({method:'subscribeAccountTrade',keys:[...watch].slice(0,12)})}updateHeader();requestUi(true)};
+ sock.onmessage=e=>{if(seq!==wsGeneration)return;let m;try{m=JSON.parse(e.data)}catch{return}if(m?.message&&!m?.txType){const msg=String(m.message).slice(0,120);if(/invalid|insufficient|error|unauthor/i.test(msg)){toast('Trade feed error: '+msg);conn='limited';updateHeader()}return}handleEvent(m)};
+ sock.onclose=()=>{if(seq!==wsGeneration)return;conn='offline';updateHeader();retryTimer=setTimeout(connect,Math.min(25000,900*2**Math.min(retry++,5))+Math.random()*300)};sock.onerror=()=>{if(seq===wsGeneration){conn='offline';updateHeader()}}}
+function subscribeMint(mint){if(!tradeKey||!validAddr(mint)||subs.has(mint)||!ws||ws.readyState!==1)return;
+ const cap=Number($('#subCap').value)||16;if(subs.size>=cap){// Evict the oldest low-activity stream; preserve the currently inspected coin.
+ let remove=[...subs.keys()].filter(k=>k!==selected).sort((a,b)=>{const x=tokens.get(a),y=tokens.get(b);const sa=(x?age(x)-Math.min(x.trades.length,30)*1800:1e7),sb=(y?age(y)-Math.min(y.trades.length,30)*1800:1e7);return sb-sa})[0]||remove;
+ if(remove){send({method:'unsubscribeTokenTrade',keys:[remove]});subs.delete(remove)}}
+ if(subs.size>=cap)return;subs.set(mint,now());send({method:'subscribeTokenTrade',keys:[mint]});updateHeader()}
+function trimSubscriptions(){if(!tradeKey)return;for(const [mint,subAt]of subs){const t=tokens.get(mint);if(!t||mint!==selected&&(age(t)>80000||(now()-subAt>18000&&t.trades.length<3))){send({method:'unsubscribeTokenTrade',keys:[mint]});subs.delete(mint)}}}
+function summarize(t,ts=now()){const bucket=Math.floor(ts/2000);if(t._cached&&t._cacheRev===t.rev&&t._cacheBucket===bucket&&t._cacheX===xLast)return t._cached;const tr=t.trades.filter(e=>ts-e.ts<=125000),w10=tr.filter(e=>ts-e.ts<=10000),w30=tr.filter(e=>ts-e.ts<=30000),w60=tr.filter(e=>ts-e.ts<=60000),older=tr.filter(e=>ts-e.ts>30000&&ts-e.ts<=60000);const sol=(a,side)=>a.reduce((v,e)=>v+(e.side===side?e.sol:0),0);const buyers=new Set(tr.filter(e=>e.side==='buy').map(e=>e.who).filter(Boolean));const lastBuys=sol(w60,'buy'),lastSells=sol(w60,'sell');const ratio=lastBuys/Math.max(.1,lastSells),flow=sol(w30,'buy')-sol(w30,'sell');let holdings=[...t.wallets.entries()].filter(([w,v])=>v.balance!=null&&v.balance>0).sort((a,b)=>b[1].balance-a[1].balance);const top=holdings[0]?.[1].balance/MINT_TOTAL??null,creatorHolding=t.creator?holdings.find(([w])=>w===t.creator)?.[1].balance/MINT_TOTAL??null:null;const fastHolding=holdings.filter(([w])=>t.snipers.has(w)).reduce((a,[,v])=>a+v.balance,0)/MINT_TOTAL;
+ const end=t.prices.at(-1)?.p??null,entry=t.firstPrice,change=entry&&end?end/entry-1:0,drawdown=t.peak&&end?1-end/t.peak:0;const oldBuy=sol(older,'buy'),newBuy=sol(w30,'buy');const repeat=tr.length>=10&&Object.values(tr.reduce((a,e)=>(a[e.sol.toFixed(3)]=(a[e.sol.toFixed(3)]||0)+1,a),{})).some(c=>c/tr.length>=.45);
+ const alerts=[];if(t.devSold)alerts.push('Creator has sold (observed)');if(top!=null&&top>=.4)alerts.push('One observed wallet holds 40%+');if(drawdown>=.5&&change>.4)alerts.push('Large reversal after a price spike');if(fastHolding>=.2&&t.snipers.size>=3)alerts.push('Early buyers hold 20%+ of supply');if(repeat)alerts.push('Repeated trade sizes may be automated');if(ts-t.lastTrade>25000&&t.trades.length>1)alerts.push('Recent trades have slowed');
+ const score=clamp(Math.round(12+Math.min(20,buyers.size*3)+Math.min(20,w10.length*2)+clamp(flow/3,0,1)*16+clamp(newBuy/(oldBuy+.3),0,3)*5+Math.min(15,Math.max(0,change)*20)-alerts.length*16),0,100);
+ const hasTradeFeed=t.tradeObserved,stage=hasTradeFeed&&tr.length>=9&&buyers.size>=7&&w10.length>=2&&flow>0&&change>0&&!alerts.length&&drawdown<.35?'checked':hasTradeFeed&&tr.length>=3&&buyers.size>=2?'building':'launch';
+ const result={mint:t.mint,name:t.name,symbol:t.symbol,firstSeen:t.firstSeen,rev:t.rev,cap:t.cap,stage,score,risk:alerts.some(x=>/sold|40%\+|20%\+|reversal/.test(x))?'HIGH':hasTradeFeed?'OBSERVED':'LIMITED',alerts,top,creatorHolding,fastHolding,buyers:buyers.size,flow,ratio,rate:w10.length,buys:t.buys,sells:t.sells,change,drawdown,tradeObserved:hasTradeFeed,res:t.res,holdings,x:xCoins.get(t.mint)||null};t._cached=result;t._cacheRev=t.rev;t._cacheBucket=bucket;t._cacheX=xLast;return result;}
+const scoreSort=(a,b)=>{if($('#sort').value==='new')return b.firstSeen-a.firstSeen;if($('#sort').value==='flow')return b.rate-a.rate||b.score-a.score;if($('#sort').value==='social')return (b.x?.authors||0)-(a.x?.authors||0)||b.score-a.score;const rank={checked:3,building:2,launch:1};return rank[b.stage]-rank[a.stage]||b.score-a.score||b.firstSeen-a.firstSeen};
+function activeList(){const cutoff=Number($('#maxAge').value)*1000,minimum=Number($('#minBuyers').value)||0,hide=$('#hideHigh').checked;return [...tokens.values()].filter(t=>age(t)<=cutoff).map(t=>summarize(t)).filter(t=>t.buyers>=minimum&&(!hide||t.risk!=='HIGH')&&(radarMode==='early'||t.stage==='checked')).sort(scoreSort)}
+function tokenCard(t){const x=t.x,post=x?.authors||0,social=post?`<span class="risk OBSERVED">𝕏 ${post} authors</span>`:'',badge=t.stage==='checked'?'TRADE CHECKED':t.stage==='building'?'EARLY FLOW':'JUST LAUNCHED';const risk=t.risk==='HIGH'?`<span class="risk HIGH">HIGH FLAGS</span>`:t.risk==='LIMITED'?'<span class="risk LIMITED">NOT YET VERIFIED</span>':'<span class="risk OBSERVED">Observed only</span>';const notes=t.alerts[0]?`<span class="red sm">${esc(t.alerts[0])}</span>`:'';
+ return `<div class="token ${t.mint===selected?'selected':''} ${age(t)<3200?'newflash':''}" data-mint="${t.mint}" data-rev="${t.rev}"><div class="split"><div style="min-width:0"><div class="title">${esc(t.name)} <span class="mut">$${esc(t.symbol)}</span></div><div class="sm mono">${short(t.mint)} · age <span class="age" data-created="${t.firstSeen}">${fmtAge(age(t))}</span></div></div><b class="yellow" style="font-size:22px">${t.tradeObserved?t.score:'—'}</b></div><div class="meta"><span class="status ${t.stage}">${badge}</span>${risk}${social}</div>${notes}<div class="mini-grid"><div><span>Buyers observed</span>${t.buyers}</div><div><span>Trades / 10s</span>${t.rate}</div><div><span>Net 30s (SOL)</span><b class="${t.flow>=0?'green':'red'}">${money(t.flow)}</b></div><div><span>Move observed</span>${t.tradeObserved?pct(t.change):'—'}</div></div><div class="actions"><a class="linkbtn" href="https://pump.fun/coin/${t.mint}" target="_blank" rel="noopener noreferrer">OPEN PUMP.FUN</a><button class="btn secondary" data-inspect="${t.mint}">Details + bubbles</button><a class="linkbtn ghost" href="${xSearch(t.mint)}" target="_blank" rel="noopener noreferrer">𝕏</a></div></div>`}
+function renderRadar(){const all=activeList(),shown=all.slice(0,24);latestList=all;
+ $('#feedTitle').textContent=radarMode==='early'?'⚡ God Radar · launch + early momentum':'✓ Trade Checked · stricter signals';$('#hero').innerHTML=radarMode==='early'?'<b>⚡ FAST DISCOVERY · 0–3 MINUTES</b><div class="sm">New tokens appear immediately. Yellow and blue stages are not confirmed buy signals. Ranking changes as new trade evidence arrives.</div>':'<b>✓ MORE EVIDENCE, NOT A GUARANTEE</b><div class="sm">Requires actual buy/sell events, diverse buyers, positive recent flow and no major observed alerts. Without a paid trade feed this may remain empty.</div>';
+ const frag=document.createDocumentFragment();const lead=document.createElement('div');lead.className='sm';lead.textContent=`${shown.length} displayed · ${all.length} candidates match · data may be missing or delayed`;frag.append(lead);if(!all.length){const empty=document.createElement('div');empty.className='empty';empty.textContent=conn!=='connected'?'Connecting to PumpPortal launches…':radarMode==='checked'?'No coins currently meet the trade-evidence checks. Switch to God Radar for new launches.':'No new launches match this window yet.';frag.append(empty)}
+ for(const t of shown){const box=document.createElement('div');box.innerHTML=tokenCard(t);frag.append(box.firstElementChild)}$('#feed').replaceChildren(frag);
+ for(const t of shown){if(t.stage!=='checked'||alertsSeen.has(t.mint))continue;alertsSeen.add(t.mint);if(sounds&&audioCtx){try{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=900;g.gain.value=.07;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.13)}catch{}}}
+ $('#metricLaunch').textContent=[...tokens.values()].filter(t=>age(t)<180000).length;$('#metricEarly').textContent=all.filter(t=>t.stage!=='checked').length;$('#metricChecked').textContent=all.filter(t=>t.stage==='checked').length;$('#metricX').textContent=xCoins.size;updateDetail()}
+function circleMap(s){const h=s.holdings.slice(0,22),max=h[0]?.[1].balance||1,used=[];let circles='';for(let i=0;i<h.length;i++){const [w,p]=h[i],r=5+Math.min(26,27*Math.sqrt(p.balance/max)),c=w===tokens.get(s.mint)?.creator?'#f6bd5d':tokens.get(s.mint)?.snipers.has(w)?'#c495ff':'#59bbff';let hit=null;for(let j=0;j<1250;j++){const a=(i*2.4+j*.47),d=6+Math.sqrt(j)*5.5,x=165+Math.cos(a)*d,y=108+Math.sin(a)*d*.7;if(x-r<3||x+r>328||y-r<3||y+r>211)continue;if(used.every(q=>Math.hypot(q.x-x,q.y-y)>q.r+r+2)){hit={x,y,r};break}}if(!hit)continue;used.push(hit);circles+=`<circle cx="${hit.x.toFixed(1)}" cy="${hit.y.toFixed(1)}" r="${r.toFixed(1)}" fill="${c}" role="img" aria-label="${esc(short(w))}" ><title>${esc(short(w))}: ${(p.balance/MINT_TOTAL*100).toFixed(2)}% observed tokens</title></circle>`}return `<svg class="bubble" role="img" viewBox="0 0 330 216" aria-label="Observed wallet balances, not verified wallet connections">${circles||'<text x="31" y="115" fill="#8195a8" font-size="13">No observed balances yet</text>'}</svg>`}
+let detailRev=-1,detailXStamp=0,detailMint=null;
+function updateDetail(force=false){if(!selected){$('#detail').innerHTML='<h2>Coin details and holder bubbles</h2><p class="mut">Tap any coin to inspect observed wallet balances, buying activity, and X mentions.</p>';return}const t=tokens.get(selected);if(!t){$('#detail').innerHTML='<h2>Coin left the radar</h2><p class="mut">Select another coin.</p>';selected=null;return}const s=summarize(t);if(!force&&detailMint===selected&&detailRev===t.rev&&detailXStamp===xLast)return;detailRev=t.rev;detailXStamp=xLast;detailMint=selected;
+ const x=s.x,postLinks=(x?.posts||[]).slice(0,3).map(p=>`<div class="rw"><a href="https://x.com/i/web/status/${safePostId(p.id)||'0'}" target="_blank" rel="noopener noreferrer">${esc(p.user||'X post')}</a><span class="mut">${esc(String(p.text||'').slice(0,75))}</span></div>`).join('');const top=s.top==null?'Unknown (partial data)':(s.top*100).toFixed(1)+'%';const walletRows=s.holdings.slice(0,6).map(([w,p])=>`<div class="rw"><span>${esc(short(w))}${w===t.creator?' · creator':t.snipers.has(w)?' · early':''}</span><b>${(100*p.balance/MINT_TOTAL).toFixed(2)}%</b></div>`).join('');
+ $('#detail').innerHTML=`<h2>${esc(s.name)} <span class="mut">$${esc(s.symbol)}</span></h2><p class="sm mono">${esc(s.mint)}</p><div class="meta"><span class="status ${s.stage}">${s.stage==='checked'?'TRADE CHECKED':s.stage==='building'?'EARLY FLOW':'LAUNCH ONLY'}</span><span class="risk ${s.risk}">${s.risk==='LIMITED'?'UNKNOWN RISK':'Risk: '+s.risk}</span></div><div class="rows"><div class="rw"><span>Visible buys / sells</span><b>${s.buys} / ${s.sells}</b></div><div class="rw"><span>Recent unique buyers</span><b>${s.buyers}</b></div><div class="rw"><span>Market cap</span><b>${s.cap==null?'Unavailable':money(s.cap)+' SOL'}</b></div><div class="rw"><span>Observed peak drawdown</span><b>${(s.drawdown*100).toFixed(0)}%</b></div><div class="rw"><span>X independent posters</span><b>${x?.authors||0}</b></div></div><hr class="hr"><h3>Observed holder bubbles</h3>${circleMap(s)}<p class="mapmeta">Golden = creator · Purple = first 3s buyers · Blue = others. Only balances seen in this browser session; no full holder snapshot, funding links, or proof of independent wallets.</p>${walletRows||'<p class="sm">No observed wallet balances yet. Trade access may be missing.</p>'}<div class="actions"><a class="linkbtn ghost" target="_blank" rel="noopener noreferrer" href="https://v2.bubblemaps.io/?chain=solana">Bubblemaps (paste CA)</a><button class="btn" data-copy="${s.mint}">Copy CA</button></div><hr class="hr"><h3>Early warning signs</h3>${s.alerts.map(a=>`<p class="red sm">• ${esc(a)}</p>`).join('')||'<p class="sm">No warning triggered in the limited observed data. This does not establish safety.</p>'}<h3>Social posts</h3>${postLinks||'<p class="sm">No X API matches yet. An empty result is not proof of no discussion.</p>'}<div class="actions"><a class="linkbtn ghost" href="${xSearch(s.mint)}" target="_blank" rel="noopener noreferrer">Search X</a><a class="linkbtn" href="https://pump.fun/coin/${s.mint}" target="_blank" rel="noopener noreferrer">Open Pump.fun</a></div><hr class="hr"><button class="btn" data-paper="${s.mint}" ${s.res?'':'disabled'}>Practice buy (fake SOL only)</button><p class="sm">Requires bonding-curve price; no live orders or wallet connection.</p>`}
+function renderX(){const entries=[...xCoins.values()].sort((a,b)=>(b.buzzScore-a.buzzScore)||(b.authors-a.authors)||(b.latestAt-a.latestAt)).slice(0,35);$('#hero').innerHTML='<b>𝕏 SOCIAL SIGNALS — read-only</b><div class="sm">Mentions by distinct authors may indicate attention, not legitimacy. Paid promotions, bot posts and recycled contracts can manipulate this ranking.</div>';$('#feedTitle').textContent='X mentions containing explicit Pump.fun token addresses';let html=`<p class="sm">${xState==='ok'?'Last X sync: '+new Date(xLast).toLocaleTimeString():'X sync: '+esc(xError||xState)} · ${entries.length} contract addresses currently cached. The Worker requires X API setup.</p>`;
+ if(!entries.length)html+='<div class="empty">No social data yet. Connect the X Worker in the left panel, or search X manually using a coin’s 𝕏 button.</div>';for(const x of entries){const tk=tokens.get(x.mint),last=x.latestAt?new Date(x.latestAt).toLocaleTimeString():'unknown',posts=x.posts.slice(0,3).map(p=>`<div class="post"><b>${esc(p.user||'X user')}</b> · <a href="https://x.com/i/web/status/${safePostId(p.id)||'0'}" rel="noopener noreferrer" target="_blank">Read post</a><div class="sm">${esc(String(p.text||'').slice(0,220))}</div></div>`).join('');html+=`<article class="pulse"><div class="split wrap"><b>${esc(tk?.name||short(x.mint))} ${tk?'$'+esc(tk.symbol):''}</b><span class="yellow">X attention ${x.buzzScore}/100 · ${x.authors} posters</span></div><div class="sm">${x.postsCount} mentions · newest ${esc(last)} · ${tk?'MATCHED TO LIVE LAUNCH':'X ONLY / LAUNCH UNCONFIRMED'}</div>${posts}<div class="actions"><a class="linkbtn" href="https://pump.fun/coin/${x.mint}" target="_blank" rel="noopener noreferrer">Open Pump.fun</a><a class="linkbtn ghost" href="${xSearch(x.mint)}" target="_blank" rel="noopener noreferrer">Search X</a>${tk?`<button class="btn" data-inspect="${x.mint}">Trade data</button>`:''}</div></article>`}$('#feed').innerHTML=html;$('#metricX').textContent=xCoins.size}
+function renderWatch(){let rows=[...watch].map(w=>{const b=walletBuys.get(w)||[];return `<article class="pulse"><b>${esc(short(w))}</b> <button class="btn" data-unwatch="${w}">Remove</button><p class="sm">${b.length} observed buys in this session. Following wallets doesn't establish skill or legality.</p>${b.slice(0,3).map(x=>`<div class="rw"><a href="https://pump.fun/coin/${x.mint}" target="_blank" rel="noopener noreferrer">${short(x.mint)}</a><span>${money(x.sol)} SOL · ${fmtAge(now()-x.when)} ago</span></div>`).join('')}</article>`}).join('');$('#hero').innerHTML='<b>WATCHED WALLETS</b><div class="sm">Only transactions observed since you opened the page. Wallet history and profitability are not verified.</div>';$('#feedTitle').textContent='Watchlist';$('#feed').innerHTML=`<div class="inline"><input class="input stretch" id="watchInput" placeholder="Solana wallet address"><button class="btn" id="watchAdd">Watch</button></div>${rows||'<div class="empty">Add a wallet address to watch observed trades. Paid streaming is needed for account trade tracking.</div>'}`}
+function rollDay(){const d=new Date().toDateString();if(account.day!==d){account.day=d;account.dayStart=account.bal;account.pnlDay=0;savePaper()}}
+function buyOut(r,dx){return r.vt-r.vs*r.vt/(r.vs+dx)}function sellOut(r,tk){return r.vs-r.vs*r.vt/(r.vt+tk)}
+function openPaper(mint){rollDay();if(account.stopped)return toast('Practice stopped. Resume it in Practice tab.');const t=tokens.get(mint);if(!t?.res||age(t)>300000)return toast('Need a recent live bonding-curve price.');if(account.pnlDay<=-.06*account.dayStart)return toast('Practice daily loss limit reached (6%).');const size=Math.min(.10,account.bal*.1);if(size<.01||account.bal<size*1.01)return toast('Insufficient fake SOL.');const fee=.01,qty=buyOut(t.res,size);if(!Number.isFinite(qty)||qty<=0)return toast('Cannot estimate a fill');account.bal-=size*(1+fee);paper.unshift({practice:true,mint,name:t.name,sym:t.symbol,at:now(),sol:size,tk:qty,fee:1,sl:12,tp:50,mh:15,sc:summarize(t).score,hit:null,last:size});savePaper();toast('Opened PAPER trade, not real money');currentTab='paper';requestUi(true)}
+function paperValue(p){const t=tokens.get(p.mint);if(!t?.res||!Number.isFinite(p.tk)||p.tk<=0)return null;const r=t.res;return sellOut(r,p.tk)}
+function closePaper(p,why){const fee=Number(p.fee??1)/100,value=paperValue(p)??p.last??p.sol,out=value*(1-fee),pnl=out-p.sol*(1+fee);account.bal+=out;account.pnlDay+=pnl;closed.unshift({name:p.name,sym:p.sym,pnl,ret:pnl/(p.sol*(1+fee)),why,held:now()-p.at,fee:p.fee,sol:p.sol,sc:p.sc});closed=closed.slice(0,150);paper=paper.filter(x=>x!==p);savePaper()}
+function tickPaper(){if(!paper.length)return;for(const p of [...paper]){const v=paperValue(p);if(v!=null)p.last=v;const pl=v!=null?v/p.sol-1:null,held=now()-p.at;if(pl!=null&&p.sl&&pl<=-p.sl/100)closePaper(p,'STOP (practice)');else if(pl!=null&&p.tp&&pl>=p.tp/100)closePaper(p,'TARGET (practice)');else if(p.mh&&held>=p.mh*60000){if(v!=null)closePaper(p,'TIME (practice)');else p.hit='TIME — price unavailable'}}if(currentTab==='paper')requestUi()}
+function renderPaper(){rollDay();$('#hero').innerHTML='<b>PRACTICE ONLY — zero real trades</b><div class="sm">Fake balance, estimated quotes, 12% stop, 50% target, 15-minute maximum hold, 6% daily loss limit. Missing live prices prevent accurate exits; stop levels are not guaranteed on real markets.</div>';$('#feedTitle').textContent='Your paper account';let h=`<div class="stats"><div class="metric"><b>${money(account.bal,3)}</b><span>fake SOL</span></div><div class="metric"><b>${money(account.pnlDay,3)}</b><span>today fake P/L</span></div></div><div class="inline wrap"><button class="btn critical" id="paperStop">${account.stopped?'Resume practice':'Emergency stop'}</button><button class="btn secondary" id="paperReset">Reset paper balance</button></div><hr class="hr"><h3>Open practice positions</h3>`;for(let i=0;i<paper.length;i++){const p=paper[i],v=paperValue(p),pl=v!=null?100*(v/p.sol-1):null;h+=`<div class="pulse"><b>${esc(p.name||'Unnamed')} $${esc(p.sym)}</b><p class="sm">${money(p.sol,3)} fake SOL · ${fmtAge(now()-p.at)} held · ${pl==null?'Price unavailable':money(pl,1)+'% estimated before fees'} · ${esc(p.hit||'Open')}</p><button class="btn" data-closepaper="${i}">Close practice position</button></div>`}h+=paper.length?'':'<div class="empty">Open a coin’s details and use Practice buy.</div>';h+='<h3>Recent closed results</h3>'+closed.slice(0,12).map(p=>`<div class="rw"><span>${esc(p.name||'?')} · ${esc(p.why||'exit')}</span><b class="${p.pnl>=0?'green':'red'}">${pct(Number(p.ret)||0)}</b></div>`).join('');$('#feed').innerHTML=h}
+function renderGuide(){$('#hero').innerHTML='<b>HOW TURBO WORKS</b><div class="sm">Priority: fast discovery, transparent evidence, manual decisions.</div>';$('#feedTitle').textContent='Safety and setup';$('#feed').innerHTML=`<div id="help" class="panel"><h3>1. Instant Radar</h3><p>New token creation events are streamed through a single PumpPortal WebSocket. The first sighting appears without waiting for 10 or 15 buyers.</p><h3>2. Trade Checked</h3><p>Requires a separate paid PumpPortal data API key. More observed buyers, trade flow and fewer red flags move a coin into Trade Checked. This does not prove safety or predict returns.</p><h3>3. X Social Pulse</h3><p>Connect a Cloudflare Worker configured with your own X Bearer Token to read recent posts. The Worker searches for actual token mint addresses in Pump.fun links and contract-address text. Never publish a Bearer Token or private key in GitHub.</p><h3>4. Bubble map</h3><p>Wallet circles are only balances observed in this browser tab; they are not independent full-chain holder analysis. For complete clusters, inspect the token manually on an on-chain analytics platform.</p><h3>5. Price and limits</h3><p>Scores are heuristics. Real trading can lose everything due to rugs, sniping, slippage, bot manipulation and failed exits. Practice trades use estimates and are not equivalent to real fills. A browser running in the background may stop receiving updates.</p><h3>6. X setup</h3><p>Deploy the included Cloudflare Worker from the ZIP, create an X API app, save the token as a Cloudflare secret, then paste the Worker public URL in the controls. The scan interval and budget are configurable in the Worker; X access may be paid.</p></div>`}
+function updateHeader(){const tag=$('#connection');tag.className='tag '+(conn==='connected'?'good':conn==='offline'||conn==='limited'?'bad':'warn');tag.textContent=conn==='connected'?'● PumpPortal live':conn==='limited'?'Trade feed rejected':conn==='offline'?'Stream offline':'Connecting…';const dt=$('#dataStatus');dt.className='tag '+(tradeKey?'warn':'');dt.textContent=tradeKey?`Paid trades: ${subs.size}/${$('#subCap').value}`:'Launch-only · free';$('#streamInfo').textContent=tradeKey?`${subs.size} subscribed coin streams · ${traffic} trades received this tab. Paid per streamed event.`:'No trade API key. Early launches are visible but buying metrics are unavailable.';const x=$('#xStatus');x.className='tag '+(xState==='ok'?'good':xState==='error'?'bad':'');x.textContent=xState==='ok'?'𝕏 feed live':xState==='error'?'X: error':'𝕏: '+(workerBase?'connecting':'not connected')}
+function requestUi(urgent=false){if(urgent)navForce=true;if(frameTimer)return;const delay=urgent?90:Math.max(100,380-(now()-lastRender));frameTimer=setTimeout(()=>{frameTimer=null;render()},delay)}
+function render(){if(paused&&!navForce)return;lastRender=now();navForce=false;updateHeader();$$('#tabs button').forEach(el=>el.classList.toggle('on',el.dataset.tab===currentTab));$('#earlyBtn').classList.toggle('on',radarMode==='early');$('#checkedBtn').classList.toggle('on',radarMode==='checked');$('#metricX').textContent=xCoins.size;
+ if(currentTab==='radar')renderRadar();else if(currentTab==='x')renderX();else if(currentTab==='watch')renderWatch();else if(currentTab==='paper')renderPaper();else renderGuide();const elapsed=lastStream?Math.round((now()-lastStream)/1000):null;$('#latency').textContent=elapsed==null?'No event yet':`Last stream event ${elapsed}s ago`}
+function cleanup(){const cutoff=now()-TOKEN_TTL;for(const [mint,t]of tokens){if(t.firstSeen<cutoff){tokens.delete(mint);if(subs.has(mint)){send({method:'unsubscribeTokenTrade',keys:[mint]});subs.delete(mint)}}}if(tokens.size>MAX_TOKENS){const o=[...tokens.values()].sort((a,b)=>a.firstSeen-b.firstSeen);for(let i=0;i<tokens.size-MAX_TOKENS;i++)tokens.delete(o[i].mint)}for(const [mint,t]of [...xCoins])if(t.latestAt<now()-4*60*60*1000)xCoins.delete(mint);for(const w of walletBuys.keys())if(!watch.has(w))walletBuys.delete(w);trimSubscriptions()}
+function validWorkerUrl(s){try{const u=new URL(s.trim());if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash)return null;return u.origin+u.pathname.replace(/\/+$/,'')}catch{return null}}
+async function pollSocial(){if(!workerBase||workerBusy)return;workerBusy=true;const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),8000);try{const r=await fetch(workerBase+'/api/x-pulse',{signal:ctrl.signal,cache:'no-store'});if(!r.ok)throw new Error('Worker HTTP '+r.status);const j=await r.json();if(!j||!Array.isArray(j.coins))throw new Error('Unexpected Worker response');xCoins.clear();for(const c of j.coins.slice(0,60)){if(!validAddr(c.mint))continue;const posts=Array.isArray(c.posts)?c.posts.filter(p=>safePostId(p.id)).slice(0,5).map(p=>({id:String(p.id),text:String(p.text||'').slice(0,420),user:String(p.user||'').slice(0,50)})):[];xCoins.set(c.mint,{mint:c.mint,authors:clamp(Number(c.authors)||0,0,10000),buzzScore:clamp(Number(c.buzzScore)||0,0,100),postsCount:clamp(Number(c.postsCount)||0,0,20000),latestAt:Number(c.latestAt)||now(),posts})}xLast=Number(j.updatedAt)||now();xState=j.status==='ok'?'ok':String(j.status||'waiting');xError=String(j.message||'');$('#workerInfo').textContent=`Worker: ${xState}. ${j.message||''} Last update: ${xLast?new Date(xLast).toLocaleTimeString():'never'}`;requestUi(true)}catch(e){xState='error';xError=String(e.message).slice(0,80);$('#workerInfo').textContent='X feed error: '+xError;requestUi(true)}finally{workerBusy=false;clearTimeout(timeout);updateHeader()}}
+function setWorker(url){const val=validWorkerUrl(url);if(!val)return toast('Enter a valid HTTPS Cloudflare Worker URL.');workerBase=val;try{localStorage.setItem('pvt_worker',workerBase)}catch{}xState='connecting';pollSocial();updateHeader()}
+$('#saveWorker').onclick=()=>setWorker($('#workerUrl').value);$('#removeWorker').onclick=()=>{workerBase='';xCoins.clear();xState='off';xError='';try{localStorage.removeItem('pvt_worker')}catch{}$('#workerInfo').textContent='Worker disconnected.';requestUi(true)};
+$('#keyConnect').onclick=()=>{const k=$('#pumpKey').value.trim();if(k.length<10||/\s/.test(k))return toast('That is not a data API key. Never enter wallet secrets.');tradeKey=k;$('#pumpKey').value='';traffic=0;connect();toast('Paid trade stream requested. Usage can incur SOL fees.')};$('#keyDisconnect').onclick=()=>{tradeKey='';$('#pumpKey').value='';traffic=0;connect();toast('Back to free launch-only mode.')};$('#subCap').onchange=()=>{while(subs.size>Number($('#subCap').value)){const mint=[...subs.keys()][0];subs.delete(mint);send({method:'unsubscribeTokenTrade',keys:[mint]})}requestUi(true)};
+$('#earlyBtn').onclick=()=>{radarMode='early';currentTab='radar';requestUi(true)};$('#checkedBtn').onclick=()=>{radarMode='checked';currentTab='radar';requestUi(true)};
+for(const id of ['sort','maxAge','minBuyers','hideHigh'])$('#'+id).addEventListener('input',()=>requestUi(true));
+$('#tabs').onclick=e=>{const el=e.target.closest('[data-tab]');if(!el)return;currentTab=el.dataset.tab;requestUi(true)};
+$('#feed').onclick=e=>{const ins=e.target.closest('[data-inspect]');if(ins){selected=ins.dataset.inspect;detailRev=-1;subscribeMint(selected);updateDetail(true);if(innerWidth<760)$('#detail').scrollIntoView({behavior:'smooth',block:'start'});return}const v=e.target.closest('[data-unwatch]');if(v){watch.delete(v.dataset.unwatch);saveWatch();requestUi(true);return}if(e.target.id==='watchAdd'){const input=$('#watchInput'),w=input.value.trim();if(!validAddr(w))return toast('Enter a valid Solana wallet address');watch.add(w);saveWatch();if(tradeKey)send({method:'subscribeAccountTrade',keys:[w]});requestUi(true);return}const c=e.target.closest('[data-closepaper]');if(c){const p=paper[Number(c.dataset.closepaper)];if(p){closePaper(p,'MANUAL');requestUi(true)}return}if(e.target.id==='paperStop'){account.stopped=!account.stopped;savePaper();requestUi(true);return}if(e.target.id==='paperReset'){if(confirm('Reset all practice money and closed history?')){account={start:1,bal:1,day:'',dayStart:1,pnlDay:0,stopped:false};paper=[];closed=[];savePaper();requestUi(true)}return}};
+$('#detail').onclick=e=>{const b=e.target.closest('[data-paper]');if(b){openPaper(b.dataset.paper);return}const c=e.target.closest('[data-copy]');if(c){navigator.clipboard?.writeText(c.dataset.copy).then(()=>toast('Contract address copied')).catch(()=>toast('Copy not available'));return}};
+$('#sound').onclick=()=>{sounds=!sounds;try{if(sounds){audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}}catch{sounds=false;toast('Sound unavailable in this browser')}$('#sound').textContent=sounds?'🔔 Alerts on':'🔕 Alerts off'};
+$('#panic').onclick=()=>{account.stopped=true;savePaper();toast('Emergency stop activated for paper trading only');requestUi(true)};
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){account.stopped=true;savePaper();toast('Practice trading stopped')}});
+document.addEventListener('visibilitychange',()=>{paused=document.hidden;if(!paused){navForce=true;requestUi(true)}});
+setInterval(()=>{cleanup();tickPaper();if(!document.hidden){$$('.age').forEach(e=>e.textContent=fmtAge(now()-Number(e.dataset.created)));const elapsed=lastStream?Math.round((now()-lastStream)/1000):null;$('#latency').textContent=elapsed==null?'No event yet':`Last stream event ${elapsed}s ago`;if(currentTab==='radar')requestUi() }},2000);
+setInterval(pollSocial,16000);
+$('#workerUrl').value=workerBase;if(workerBase){xState='connecting';pollSocial()}updateHeader();connect();requestUi(true);
 </script></body></html>
