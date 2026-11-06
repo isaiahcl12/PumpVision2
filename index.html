@@ -12,7 +12,7 @@ aside{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding
 summary{cursor:pointer;font-weight:600;margin-bottom:8px}
 label{display:block;margin:8px 0;color:var(--mu);font-size:12px}label input,label select{display:block;width:100%;margin-top:3px;padding:7px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit}
 label.chk{display:flex;gap:8px;align-items:center;color:var(--tx)}label.chk input{width:auto;margin:0}
-.card{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer}.card.sel{border-color:var(--bl)}
+.card,.wc{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer}.card.sel{border-color:var(--bl)}
 .hd{display:flex;justify-content:space-between;gap:8px}.age{color:var(--bl);font-weight:600}
 .tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
 .score{min-width:38px;text-align:center;padding:3px 8px;border-radius:6px;font-weight:700;color:#06100a}
@@ -27,26 +27,35 @@ h3{margin:0 0 8px}.bar{display:flex;justify-content:space-between;font-size:12px
 .why{margin:6px 0;padding-left:8px;border-left:3px solid var(--am);font-size:13px}.why.confirmed{border-color:var(--rd)}
 .tr{display:flex;justify-content:space-between;font-size:12px;padding:2px 0}.buy{color:var(--gr)}.sell{color:var(--rd)}
 .empty{padding:28px 12px;text-align:center;color:var(--mu)}footer{padding:4px 14px 24px;color:var(--mu);font-size:12px}
-.nw{background:var(--gr);color:#04140a;font-weight:700;font-size:11px;padding:2px 6px;border-radius:5px}</style></head><body>
-<header><b class="logo">Pump<i>Vision</i> AI</b><span id="st" class="pill"></span><span>New in 5 min: <b id="n1">0</b></span><span>Score 70+: <b id="n2">0</b></span><span class="mu" id="lat"></span></header>
+.nw{background:var(--gr);color:#04140a;font-weight:700;font-size:11px;padding:2px 6px;border-radius:5px}.mini input{flex:2;min-width:0;padding:8px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit}.wc p{margin:6px 0}#pin{flex-basis:100%}#pin:empty{display:none}
+.pinbox{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;border:1px solid var(--gr);background:#0f2a1a}.pinbox.bad{border-color:var(--rd);background:#2a1014}
+.pinbox .open{padding:8px 12px;font-size:13px;flex:0 0 auto}.pinbox button{padding:6px 10px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit;font-size:12px}
+.mk{width:100%;margin-top:8px;padding:10px;background:var(--bl);color:#04101a;font-weight:700;border:0;border-radius:8px;font:inherit}</style></head><body>
+<header><b class="logo">Pump<i>Vision</i> AI</b><span id="st" class="pill"></span><span>New in 5 min: <b id="n1">0</b></span><span>Score 70+: <b id="n2">0</b></span><span class="mu" id="lat"></span><div id="pin"></div></header>
 <main>
 <aside><details open><summary>Filters</summary>
-<div class="mini"><button id="pQuick">Quick trade</button><button id="pStrict">Stricter</button></div>
+<div class="mini"><button id="pAll">Show all</button><button id="pQuick">Quick trade</button><button id="pStrict">Stricter</button></div>
 <label>Sort by<select id="sort"><option value="score">Highest score</option><option value="new">Newest</option><option value="fast">Most trades (last 10s)</option><option value="move">Biggest move since launch</option></select></label>
 <label>Token age<select id="age"><option value="0-300">Last 5 minutes</option><option value="0-30">0 to 30 seconds</option><option value="30-60">30 to 60 seconds</option><option value="60-120">1 to 2 minutes</option><option value="120-180">2 to 3 minutes</option><option value="180-300">3 to 5 minutes</option></select></label>
-<label>Minimum score<input id="score" type="number" value="40"></label>
-<label>Minimum unique buyers<input id="buyers" type="number" value="5"></label>
-<label>Minimum buy/sell ratio<input id="ratio" type="number" step="0.1" value="1"></label>
+<label>Minimum score<input id="score" type="number" value="0"></label>
+<label>Minimum unique buyers<input id="buyers" type="number" value="0"></label>
+<label>Minimum buy/sell ratio<input id="ratio" type="number" step="0.1" value="0"></label>
 <label>Minimum net SOL in<input id="net" type="number" step="0.5" value="0"></label>
 <label>Max top-holder %<input id="top" type="number" value="100"></label>
 <label class="chk"><input id="hide" type="checkbox"> Exclude HIGH risk</label>
 <label class="chk"><input id="snd" type="checkbox"> Sound alert for new matches</label>
-<label>Alert at score<input id="aS" type="number" value="55"></label>
-<p class="mu small">Defaults are loose for quick trades. High-risk tokens show a red label. Most new tokens lose value fast, so only risk money you can afford to lose.</p></details></aside>
-<section id="feed"></section>
+<label>Alert at score<input id="aS" type="number" value="70"></label>
+<label>Most I can lose per trade (SOL)<input id="mx" type="number" step="0.01" placeholder="enter your limit"></label>
+<label>Stop-loss %<input id="sl" type="number" value="12"></label>
+<label>Target %<input id="tp" type="number" value="50"></label>
+<label>Max hold (minutes)<input id="mh" type="number" value="15"></label>
+<p class="mu small">Defaults show every new token, best score first. High-risk tokens show a red label. Most new tokens lose value fast, so only risk money you can afford to lose.</p></details></aside>
+<section><div class="mini" id="tabs"><button data-v="tokens">Tokens</button><button data-v="wallets">Wallets</button><button data-v="mine">My trades</button></div>
+<div id="wbar" style="display:none"><p class="mu small">Wallets are ranked from trades this page has seen since you opened it. Profit is estimated at the bonding-curve price, before fees and slippage, and a short sample does not prove skill. Wallets that win by sniping may be bots or insiders. Following a wallet means buying after it, and it may sell first.</p><div class="mini"><input id="wIn" placeholder="Paste a wallet address to watch"><button id="wAdd">Watch</button></div><p class="small bad" id="wMsg"></p></div>
+<div id="feed" style="margin-top:10px"></div></section>
 <aside id="detail"></aside>
 </main>
-<footer>Scores describe observed early trading activity, not future returns. Unknown data is never treated as safe. Scans only while this page is open. Ages count from first detection in the stream. USD values are unavailable in this version (needs a SOL price feed).</footer>
+<footer>Scores describe observed early trading activity, not future returns. Unknown data is never treated as safe. Scans only while this page is open. Ages count from first detection in the stream. USD values are unavailable in this version (needs a SOL price feed). Wallet profit figures are estimates from trades this page has seen.</footer>
 <script>
 // Momentum scoring + risk analysis. Pure functions: no network, easy to test.
 const CFG = {
@@ -87,6 +96,7 @@ function analyze(tok, now = Date.now(), cfg = CFG) {
   const amt = {}; tr.forEach(t => { const k = t.sol.toFixed(3); amt[k] = (amt[k] || 0) + 1; });
   const repeat = n >= 10 && Math.max(...Object.values(amt)) / n >= 0.4;
   const big = w60.filter(t => t.sol >= cfg.whaleSol);
+  const sn = [...(tok.snipers || [])], snPct = sn.reduce((s, w) => s + (tok.balances[w] || 0), 0) / cfg.supply;
 
   const conf = c(n / cfg.minTradesForRating); // thin data earns little credit
   const comp = {
@@ -107,6 +117,7 @@ function analyze(tok, now = Date.now(), cfg = CFG) {
   if (top1 >= cfg.topHolderWarn && top1 < cfg.topHolderRisk) R('warning', `One observed wallet holds ${pc(top1)} of supply`);
   if (devPct >= cfg.devWarn && !devSold) R('warning', `Creator holds ${pc(devPct)} of supply`);
   if (repeat) R('warning', 'Many trades share identical SOL amounts (possible scripted activity, unverified)');
+  if (sn.length >= 3 && snPct >= 0.15) R('warning', `${sn.length} wallets bought within 3s of launch and hold ${pc(snPct)} (possible insiders or snipers; any link between them is unverified)`);
   if (n >= cfg.minTradesForRating && netSol < 1) R('warning', 'Little net SOL has entered the curve (low liquidity proxy)');
   if (ss60 > bs60 && w60.length >= 6) R('warning', 'Selling outweighs buying over the last 60s');
   const nc = reasons.filter(r => r.kind === 'confirmed').length, nw = reasons.length - nc;
@@ -125,7 +136,7 @@ function analyze(tok, now = Date.now(), cfg = CFG) {
     mint: tok.mint, name: tok.name, symbol: tok.symbol, firstSeen: tok.firstSeen,
     mcSol: tok.mcSol, priceSol: pNow, buys: buys.length, sells: sells.length,
     ratio: buys.length / Math.max(sells.length, 1), buyers: uniq(tr), volSol: sol(tr), netSol,
-    top1, devPct, tps10: w10.length, chg60, since: pr.length > 1 ? pNow / pr[0].p - 1 : 0, fromPeak: -dd, score, label: label(score), risk, reasons, unverified: UNVERIFIED,
+    top1, devPct, tps10: w10.length, chg60, since: pr.length > 1 ? pNow / pr[0].p - 1 : 0, fromPeak: -dd, snipers: sn.length, snPct, res: tok.res || null, score, label: label(score), risk, reasons, unverified: UNVERIFIED,
     parts: Object.keys(comp).map(k => ({ k, pts: +(comp[k] * W[k]).toFixed(1), max: W[k] })),
     explain, whale: big.length ? Math.max(...big.map(t => t.sol)) : 0,
     series: pr.filter((_, i) => i % step === 0).map(x => x.p),
@@ -141,57 +152,115 @@ const ageMs=f=>D.now-f+(Date.now()-got),fmt=ms=>{const s=Math.max(0,Math.floor(m
 const cls=s=>s>=85?'s-strong':s>=70?'s-prom':s>=50?'s-watch':'s-weak';
 const pass=t=>{const a=ageMs(t.firstSeen)/1000;return a>=F.a&&a<F.b+(F.b===300?1:0)&&t.score>=F.score&&t.buyers>=F.buyers&&t.ratio>=F.ratio&&t.netSol>=F.net&&t.top1*100<=F.top&&!(F.hide&&t.risk==='HIGH')};
 function card(t){const n=(v,d=2)=>v==null?'n/a':v.toFixed(d);const pc=v=>(v>=0?'+':'')+(v*100).toFixed(0)+'%';return`<article class="card${t.mint===sel?' sel':''}" data-m="${t.mint}"><div class="hd"><div><b>${esc(t.name||'Unnamed')}</b> <span class="mu">$${esc(t.symbol)}</span></div><span class="age" data-f="${t.firstSeen}">${fmt(ageMs(t.firstSeen))}</span></div>
-<div class="tags"><span class="score ${cls(t.score)}">${t.score}</span><span class="mu">${esc(t.label)}</span><span class="risk r-${t.risk}">${t.risk} risk</span>${newTill[t.mint]>Date.now()?'<span class="nw">NEW</span>':''}${t.whale?`<span class="whale">Whale trade ${t.whale.toFixed(1)} SOL</span>`:''}</div>
+<div class="tags"><span class="score ${cls(t.score)}">${t.score}</span><span class="mu">${esc(t.label)}</span><span class="risk r-${t.risk}">${t.risk} risk</span>${t.snipers>=3&&t.snPct>=0.15?`<span class="risk r-MODERATE">Fast buyers hold ${(t.snPct*100).toFixed(0)}%</span>`:''}${newTill[t.mint]>Date.now()?'<span class="nw">NEW</span>':''}${t.whale?`<span class="whale">Whale trade ${t.whale.toFixed(1)} SOL</span>`:''}</div>
 <div class="stats">${[['Mkt cap',n(t.mcSol,1)+' SOL'],['Price',t.priceSol==null?'n/a':t.priceSol.toExponential(2)+' SOL'],['Volume',n(t.volSol)+' SOL'],['Net in',n(t.netSol)+' SOL'],['Buys / sells',t.buys+' / '+t.sells],['Buy:sell',n(t.ratio)],['Buyers',t.buyers],['Top holder',(t.top1*100).toFixed(1)+'%'],['Since launch',pc(t.since)],['From peak',pc(t.fromPeak)],['Trades / 10s',t.tps10],['Dev holds',(t.devPct*100).toFixed(1)+'%']].map(([k,v])=>`<div><small>${k}</small>${v}</div>`).join('')}</div>
 <a class="open" href="https://pump.fun/coin/${t.mint}" target="_blank" rel="noopener noreferrer">OPEN ON PUMP.FUN</a>
 <div class="mini"><button data-copy="${t.mint}">Copy mint</button><a href="https://dexscreener.com/solana/${t.mint}" target="_blank" rel="noopener noreferrer">DexScreener</a></div></article>`}
 const SORTS={score:(a,b)=>b.score-a.score,new:(a,b)=>b.firstSeen-a.firstSeen,fast:(a,b)=>b.tps10-a.tps10||b.score-a.score,move:(a,b)=>b.since-a.since};
-let ac=null,al=new Set(),ready=false,newTill={};
+let ac=null,al=new Set(),ready=false,newTill={},view='tokens',wHit=0,WB=[];
+const pc=v=>(v>=0?'+':'')+(v*100).toFixed(0)+'%',short=w=>w.slice(0,4)+'…'+w.slice(-4);
+let watch=new Set();try{watch=new Set(JSON.parse(localStorage.getItem('pv_watch')||'[]').filter(w=>typeof w==='string'))}catch{}
+function bestBuy(w){for(const b of wb.get(w)||[]){const t=D.tokens.find(x=>x.mint===b.mint),tk=tokens.get(b.mint),p=tk&&tk.pos[w];if(!t||!p)continue;if(t.risk!=='LOW'&&t.risk!=='MODERATE')continue;if(p.out>=0.5*p.in)continue;return{b,t}}return null}
+function row(w,a,watching){const bb=bestBuy(w);
+return `<article class="wc"><div class="hd"><b>${esc(short(w))}</b><span class="mu small">${a?`${a.n} tokens, ${(a.wr*100).toFixed(0)}% up, est. ${a.pnl>=0?'+':''}${a.pnl.toFixed(2)} SOL`:'no stats yet'}</span></div>
+${a&&a.early>=3?`<div class="tags"><span class="risk r-MODERATE">Early buyer on ${a.early} tokens (could be a bot or insider)</span></div>`:''}
+${bb?`<p>Latest safer buy: <b>${esc(bb.t.name||'Unnamed')}</b> $${esc(bb.t.symbol)}, ${Math.round((Date.now()-bb.b.at)/1000)}s ago for ${bb.b.sol.toFixed(2)} SOL. Price since their buy: <b>${bb.b.px&&bb.t.priceSol?pc(bb.t.priceSol/bb.b.px-1):'n/a'}</b>. Risk ${bb.t.risk}, score ${bb.t.score}.</p><a class="open" href="https://pump.fun/coin/${esc(bb.b.mint)}" target="_blank" rel="noopener noreferrer">OPEN THEIR LATEST SAFER BUY</a>`:'<p class="mu small">No recent buy passes the check: rated LOW or MODERATE, and the wallet has not sold half.</p>'}
+<div class="mini"><button data-copy="${esc(w)}">Copy wallet</button><button data-w="${esc(w)}">${watching?'Unwatch':'Watch'}</button></div></article>`}
+function walletView(){$('#n1').textContent=D.tokens.length;$('#n2').textContent=D.tokens.filter(t=>t.score>=70).length;
+const wl=[...watch].map(w=>row(w,WB.find(r=>r.w===w)||null,true)).join(''),cand=WB.filter(r=>!watch.has(r.w)).slice(0,12).map(r=>row(r.w,r,false)).join('');
+$('#feed').innerHTML=`<h3>Watching (${watch.size})</h3>${wl||'<p class="mu small">Tap Watch on a wallet below, or paste an address above.</p>'}<h3>Candidates from this session</h3>${cand||'<div class="empty">No wallet qualifies yet. It needs 3 or more tokens, a positive estimate and 60% winners. Keep this page open.</div>'}`}
+function toggleWatch(w){if(watch.has(w))watch.delete(w);else{watch.add(w);wsend({method:'subscribeAccountTrade',keys:[w]})}try{localStorage.setItem('pv_watch',JSON.stringify([...watch]))}catch{}down=false;render()}
+let mine=[],dismissed=new Set(),pinned=null;try{mine=JSON.parse(localStorage.getItem('pv_mine')||'[]')}catch{}
+const saveMine=()=>{try{localStorage.setItem('pv_mine',JSON.stringify(mine))}catch{}};
+const lim=()=>({mx:+$('#mx').value||0,sl:+$('#sl').value||0,tp:+$('#tp').value||0,mh:+$('#mh').value||0});
+const buyOut=(r,dx)=>r.vt-r.vs*r.vt/(r.vs+dx),sellOut=(r,tk)=>r.vs-r.vs*r.vt/(r.vt+tk);
+function helper(t){if(!t.res)return'';const l=lim(),sz=l.mx>0&&l.sl>0?l.mx/(l.sl/100):0;
+let o='<h3 style="margin-top:14px">Trade math</h3><p class="mu small">Math on your own limits, not advice. Fees are not included, and a stop cannot be guaranteed on a bonding curve because the price can jump past it.</p>';
+if(!sz)return o+'<p class="small">Enter the most you can afford to lose, and a stop-loss %, in the Filters panel to see a size.</p>';
+const tk=buyOut(t.res,sz),imp=((t.res.vs+sz)/(t.res.vt-tk))/(t.res.vs/t.res.vt)-1;
+return o+`<p>Size from your limits: <b>${sz.toFixed(3)} SOL</b> (max loss divided by stop).<br>Buying that much moves the price <b>${pc(imp)}</b>, so your average fill is worse than the quote.<br>At your stop (${l.sl}%) you would lose about ${(sz*l.sl/100).toFixed(3)} SOL. At your target (${l.tp}%) you would gain about ${(sz*l.tp/100).toFixed(3)} SOL. Max hold: ${l.mh} min.</p><button class="mk" data-track="${esc(t.mint)}">I bought this: track it</button>`}
+function track(mint){const t=D.tokens.find(x=>x.mint===mint),l=lim(),sz=l.mx>0&&l.sl>0?l.mx/(l.sl/100):0;if(!t||!t.res||!sz)return;
+mine.unshift({mint,name:t.name,sym:t.symbol,at:Date.now(),sol:sz,tk:buyOut(t.res,sz),sl:l.sl,tp:l.tp,mh:l.mh,hit:null});saveMine();view='mine';down=false;render()}
+function mineVal(p){const k=tokens.get(p.mint),r=k&&k.res;if(!r)return null;const r2={vs:r.vs+p.sol,vt:r.vt-p.tk};return r2.vt>0?sellOut(r2,p.tk):null} // exit value as if your buy were in the curve
+function checkMine(){let ch=false;for(const p of mine){if(p.hit)continue;const v=mineVal(p),held=(Date.now()-p.at)/60000;let x=null;
+if(v!=null){const pl=v/p.sol-1;if(p.sl&&pl<=-p.sl/100)x='STOP';else if(p.tp&&pl>=p.tp/100)x='TARGET'}
+if(!x&&p.mh&&held>=p.mh)x='TIME';if(x){p.hit=x;ch=true}}
+if(ch){saveMine();if($('#snd').checked)beep();pin()}}
+function mineView(){$('#n1').textContent=D.tokens.length;$('#n2').textContent=D.tokens.filter(t=>t.score>=70).length;
+const rows=mine.map((p,i)=>{const v=mineVal(p),pl=v==null?null:v/p.sol-1;
+return `<article class="wc"><div class="hd"><b>${esc(p.name||'Unnamed')} <span class="mu">$${esc(p.sym)}</span></b><span class="age">${fmt(Date.now()-p.at)}</span></div>
+<p>${p.sol.toFixed(3)} SOL in. ${pl==null?'No live price (the token left the tracker).':`Estimated now: <b class="${pl>=0?'buy':'sell'}">${pc(pl)}</b> (${v-p.sol>=0?'+':''}${(v-p.sol).toFixed(3)} SOL, before fees)`}</p>
+<p class="mu small">Stop ${p.sl}%, target ${p.tp}%, max hold ${p.mh} min${p.hit?`. <b class="${p.hit==='TARGET'?'buy':'sell'}">${p.hit==='TARGET'?'Target reached':p.hit==='STOP'?'Stop level reached':'Max hold time reached'}</b>`:''}</p>
+<a class="open" href="https://pump.fun/coin/${esc(p.mint)}" target="_blank" rel="noopener noreferrer">OPEN ON PUMP.FUN</a><div class="mini"><button data-rm="${i}">Remove</button></div></article>`}).join('');
+$('#feed').innerHTML=`<h3>My trades</h3><p class="mu small">This page never places orders. It tracks a trade you make yourself from the moment you tap, using the bonding-curve price, and alerts you when your own stop, target or time limit is reached.</p>${rows||'<div class="empty">Nothing tracked. Select a token, then tap "I bought this: track it".</div>'}`}
+function pin(){if(down)return;const el=$('#pin');let html='';const hit=mine.find(p=>p.hit&&!p.ack);
+if(hit)html=`<div class="pinbox ${hit.hit==='TARGET'?'':'bad'}"><b>${esc(hit.name||'Your trade')}: ${hit.hit==='TARGET'?'target reached':hit.hit==='STOP'?'stop level reached':'max hold time reached'}</b><a class="open" href="https://pump.fun/coin/${esc(hit.mint)}" target="_blank" rel="noopener noreferrer">OPEN ON PUMP.FUN</a><button data-ack="${mine.indexOf(hit)}">Dismiss</button></div>`;
+else{let cur=pinned&&D.tokens.find(t=>t.mint===pinned&&!dismissed.has(t.mint)&&t.risk!=='HIGH');
+const best=D.tokens.filter(t=>t.score>=F.aS&&(t.risk==='LOW'||t.risk==='MODERATE')&&!dismissed.has(t.mint)).sort((a,b)=>b.score-a.score)[0];
+if(!cur||(best&&best.mint!==cur.mint&&best.score>=cur.score+10))cur=best||null;pinned=cur?cur.mint:null;
+if(cur)html=`<div class="pinbox"><b>${esc(cur.name||'Unnamed')} $${esc(cur.symbol)}</b><span>score ${cur.score}, risk ${cur.risk}, ${fmt(ageMs(cur.firstSeen))} old, ${pc(cur.since)} since launch</span><a class="open" href="https://pump.fun/coin/${esc(cur.mint)}" target="_blank" rel="noopener noreferrer">OPEN ON PUMP.FUN</a><button data-dis="${esc(cur.mint)}">Dismiss</button></div>`}
+if(el.innerHTML!==html)el.innerHTML=html}
 function beep(){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=880;g.gain.value=.15;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.18)}
 function alerts(l){const quiet=!ready;if(D.now)ready=true;let hit=false;for(const t of l){if(t.score>=F.aS&&!al.has(t.mint)){al.add(t.mint);if(!quiet){hit=true;newTill[t.mint]=Date.now()+10000}}}
-if(hit){const hd=$('header');hd.style.background='#143d24';setTimeout(()=>hd.style.background='',900);if(F.snd)beep()}}
-function render(){if(down)return;readF();const l=D.tokens.filter(pass).sort(SORTS[F.sort]||SORTS.score);alerts(l);$('#feed').innerHTML=l.length?l.map(card).join(''):`<div class="empty">${D.status==='live'?`No tokens match your filters yet. ${D.tokens.length} scanned in the last 5 minutes.`:'Waiting for the live stream.'}</div>`;$('#n1').textContent=D.tokens.length;$('#n2').textContent=D.tokens.filter(t=>t.score>=70).length;detail()}
+if(wHit){hit=true;wHit=0}if(hit){const hd=$('header');hd.style.background='#143d24';setTimeout(()=>hd.style.background='',900);if(F.snd)beep()}}
+function render(){if(down)return;readF();const l=D.tokens.filter(pass).sort(SORTS[F.sort]||SORTS.score);alerts(l);pin();document.querySelectorAll('#tabs button').forEach(b=>b.style.borderColor=b.dataset.v===view?'var(--bl)':'');$('#wbar').style.display=view==='wallets'?'block':'none';if(view==='wallets'){walletView();return}if(view==='mine'){mineView();return}$('#feed').innerHTML=l.length?l.map(card).join(''):`<div class="empty">${D.status==='live'?`No tokens match your filters yet. ${D.tokens.length} scanned in the last 5 minutes.`:'Waiting for the live stream.'}</div>`;$('#n1').textContent=D.tokens.length;$('#n2').textContent=D.tokens.filter(t=>t.score>=70).length;detail()}
 function detail(){const t=D.tokens.find(x=>x.mint===sel),el=$('#detail');
 if(!sel){el.innerHTML='<h3>Token details</h3><p class="mu">Select a token to see its score breakdown, risk reasons and recent trades.</p>';return}
 if(!t){el.innerHTML='<h3>Token details</h3><p class="mu">This token is older than 5 minutes and has left the scanner.</p>';return}
 const s=t.series,mn=Math.min(...s),mx=Math.max(...s),pts=s.length>1?s.map((p,i)=>`${i/(s.length-1)*300},${68-(mx>mn?(p-mn)/(mx-mn)*64:32)}`).join(' '):'';
 el.innerHTML=`<h3>${esc(t.name)} <span class="mu">$${esc(t.symbol)}</span></h3><svg viewBox="0 0 300 70" width="100%" height="70" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="var(--gr)" stroke-width="1.5"/></svg><p class="mu small">Price on the bonding curve since first detection.</p>
 <p>${esc(t.explain)}</p>${t.parts.map(p=>`<div class="bar"><span>${NAMES[p.k]}</span><span>${p.pts}/${p.max}</span></div><div class="track"><div style="width:${p.pts/p.max*100}%"></div></div>`).join('')}
-<h3 style="margin-top:14px">Risk: <span class="r-${t.risk}">${t.risk}</span></h3>${t.reasons.length?t.reasons.map(r=>`<div class="why ${r.kind}"><b>${r.kind==='confirmed'?'Observed risk':'Warning'}:</b> ${esc(r.text)}</div>`).join(''):'<p class="mu small">No red flags in the data available.</p>'}
+${helper(t)}<h3 style="margin-top:14px">Risk: <span class="r-${t.risk}">${t.risk}</span></h3>${t.reasons.length?t.reasons.map(r=>`<div class="why ${r.kind}"><b>${r.kind==='confirmed'?'Observed risk':'Warning'}:</b> ${esc(r.text)}</div>`).join(''):'<p class="mu small">No red flags in the data available.</p>'}
 <p class="mu small">Not checked in this version: ${t.unverified.map(esc).join('; ')}. Unchecked is not the same as safe.</p>
 <h3 style="margin-top:14px">Recent trades</h3>${t.recent.map(r=>`<div class="tr"><span class="${r.side}">${r.side}</span><span>${r.sol.toFixed(2)} SOL</span><span class="mu">${esc(r.who)}</span><span class="mu">${Math.round(r.ago/1000)}s ago</span></div>`).join('')||'<p class="mu small">No trades yet.</p>'}`}
 function bar(){const stale=Date.now()-got,q=(D.now-D.lastMsg+stale)/1000;let c,m;
 if(!sseOk||stale>4000)[c,m]=['bad','Page paused'];else if(D.status!=='live')[c,m]=['bad','Stream disconnected'];else if(!D.lastMsg||q>20)[c,m]=['warn','Stream quiet'];else[c,m]=['ok','Live'];
 $('#st').className='pill '+c;$('#st').textContent=m;$('#lat').textContent=D.lastMsg?`Last stream message ${Math.round(q)}s ago`:''}
 $('#feed').addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(b){navigator.clipboard.writeText(b.dataset.copy).then(()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy mint',1200)}).catch(()=>{b.textContent='Copy failed'});return}
-if(e.target.closest('a'))return;const c=e.target.closest('.card');if(c){sel=c.dataset.m;down=false;render();if(innerWidth<1000)$('#detail').scrollIntoView({behavior:'smooth'})}});
+const rm=e.target.closest('[data-rm]');if(rm){mine.splice(+rm.dataset.rm,1);saveMine();down=false;render();return}const wbtn=e.target.closest('[data-w]');if(wbtn){toggleWatch(wbtn.dataset.w);return}if(e.target.closest('a'))return;const c=e.target.closest('.card');if(c){sel=c.dataset.m;down=false;render();if(innerWidth<1000)$('#detail').scrollIntoView({behavior:'smooth'})}});
 document.querySelectorAll('aside input,aside select').forEach(i=>i.addEventListener('input',()=>{down=false;ready=false;render()}));
 addEventListener('pointerdown',()=>down=true);['pointerup','pointercancel'].forEach(ev=>addEventListener(ev,()=>setTimeout(()=>down=false,60)));
 setInterval(()=>{document.querySelectorAll('.age').forEach(a=>a.textContent=fmt(ageMs(+a.dataset.f)));bar()},1000);
 // ---- live engine: runs entirely in this page ----
 const WS_URL='wss://pumpportal.fun/api/data',MAX_AGE=300000,KEEP=600000,MINT_RE=/^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-const tokens=new Map(),stt={status:'connecting',lastMsg:0};let ws,attempt=0;
+const tokens=new Map(),stt={status:'connecting',lastMsg:0};const wb=new Map(),done=new Map(),seenSig=new Set();let ws,attempt=0;
 const wsend=o=>ws&&ws.readyState===1&&ws.send(JSON.stringify(o));
 function connect(){ws=new WebSocket(WS_URL);
-ws.onopen=()=>{attempt=0;stt.status='live';wsend({method:'subscribeNewToken'});const k=[...tokens.values()].filter(t=>Date.now()-t.firstSeen<MAX_AGE).map(t=>t.mint);if(k.length)wsend({method:'subscribeTokenTrade',keys:k})};
+ws.onopen=()=>{attempt=0;stt.status='live';wsend({method:'subscribeNewToken'});if(watch.size)wsend({method:'subscribeAccountTrade',keys:[...watch]});const k=[...tokens.values()].filter(t=>Date.now()-t.firstSeen<MAX_AGE).map(t=>t.mint);if(k.length)wsend({method:'subscribeTokenTrade',keys:k})};
 ws.onmessage=e=>{stt.lastMsg=Date.now();let m;try{m=JSON.parse(e.data)}catch{return}handle(m)};
 ws.onclose=()=>{stt.status='disconnected';setTimeout(connect,Math.min(30000,1000*2**attempt++)+Math.random()*500)};
 ws.onerror=()=>{}}
-function handle(m){if(!m||typeof m.mint!=='string'||!MINT_RE.test(m.mint))return;const now=Date.now();
-if(m.txType==='create'){if(tokens.has(m.mint))return;const t={mint:m.mint,name:String(m.name||'').slice(0,40),symbol:String(m.symbol||'').slice(0,12),creator:m.traderPublicKey,firstSeen:now,trades:[],balances:{},prices:[],mcSol:null};
+const okAddr=a=>typeof a==='string'&&MINT_RE.test(a);
+function fresh(m){if(!m.signature)return true;if(seenSig.has(m.signature))return false;seenSig.add(m.signature);if(seenSig.size>30000)seenSig.clear();return true}
+function recordBuy(w,mint,at,sol,px){const a=wb.get(w)||[];a.unshift({mint,at,sol,px});if(a.length>30)a.pop();wb.set(w,a);if(watch.has(w)&&ready)wHit++}
+function handle(m){if(!m||!okAddr(m.mint))return;const now=Date.now();
+if(m.txType==='create'){if(tokens.has(m.mint))return;if(m.signature)seenSig.add(m.signature);const t={mint:m.mint,name:String(m.name||'').slice(0,40),symbol:String(m.symbol||'').slice(0,12),creator:m.traderPublicKey,firstSeen:now,trades:[],balances:{},prices:[],mcSol:null,pos:{},rk:0,snipers:new Set()};
 tokens.set(m.mint,t);wsend({method:'subscribeTokenTrade',keys:[m.mint]});push(t,{...m,txType:'buy',newTokenBalance:m.initialBuy},now,Number(m.solAmount)>0)}
-else if(m.txType==='buy'||m.txType==='sell'){const t=tokens.get(m.mint);if(t)push(t,m,now,true)}}
-function push(t,m,now,isTrade){if(isTrade){t.trades.push({t:now,side:m.txType,sol:Number(m.solAmount)||0,who:m.traderPublicKey});if(t.trades.length>3000)t.trades.shift()}
-if(m.traderPublicKey&&m.newTokenBalance!=null)t.balances[m.traderPublicKey]=Number(m.newTokenBalance)||0;
-const vs=Number(m.vSolInBondingCurve),vt=Number(m.vTokensInBondingCurve);if(vs>0&&vt>0){t.prices.push({t:now,p:vs/vt});if(t.prices.length>600)t.prices.shift()}
+else if(m.txType==='buy'||m.txType==='sell'){if(!fresh(m))return;const t=tokens.get(m.mint);if(t)push(t,m,now,true);else if(m.txType==='buy'&&okAddr(m.traderPublicKey)&&watch.has(m.traderPublicKey)){const vs=Number(m.vSolInBondingCurve),vt=Number(m.vTokensInBondingCurve);recordBuy(m.traderPublicKey,m.mint,now,Number(m.solAmount)||0,vs>0&&vt>0?vs/vt:null)}}}
+function push(t,m,now,isTrade){const w=okAddr(m.traderPublicKey)?m.traderPublicKey:null,vs=Number(m.vSolInBondingCurve),vt=Number(m.vTokensInBondingCurve),px=vs>0&&vt>0?vs/vt:null;
+if(isTrade){const sol=Number(m.solAmount)||0;t.trades.push({t:now,side:m.txType,sol,who:m.traderPublicKey});if(t.trades.length>3000)t.trades.shift();
+if(w){const p=t.pos[w]||(t.pos[w]={in:0,out:0,bal:0,rank:0});if(m.txType==='buy'){p.in+=sol;if(!p.rank)p.rank=++t.rk;if(w!==t.creator&&now-t.firstSeen<=3000)t.snipers.add(w);recordBuy(w,t.mint,now,sol,px)}else p.out+=sol}}
+if(w&&m.newTokenBalance!=null){const bl=Number(m.newTokenBalance)||0;t.balances[w]=bl;if(t.pos[w])t.pos[w].bal=bl}
+if(px){t.prices.push({t:now,p:px});t.res={vs,vt};if(t.prices.length>600)t.prices.shift()}
 if(m.marketCapSol!=null)t.mcSol=Number(m.marketCapSol)}
-setInterval(()=>{const now=Date.now(),out=[];for(const t of tokens.values()){const a=now-t.firstSeen;if(a>KEEP)tokens.delete(t.mint);else if(a<=MAX_AGE)out.push(analyze(t,now))}
+function finish(t){const px=t.prices.length?t.prices[t.prices.length-1].p:0;for(const w in t.pos){const p=t.pos[w];if(w===t.creator||p.in<=0)continue;const pnl=p.out+p.bal*px-p.in,d=done.get(w)||{n:0,wins:0,pnl:0,early:0};d.n++;if(pnl>0)d.wins++;d.pnl+=pnl;if(p.rank&&p.rank<=10)d.early++;done.set(w,d)}}
+function board(){const agg=new Map(),add=(w,d)=>{const a=agg.get(w)||{n:0,wins:0,pnl:0,early:0};a.n+=d.n;a.wins+=d.wins;a.pnl+=d.pnl;a.early+=d.early;agg.set(w,a)};
+for(const[w,d]of done)add(w,d);
+for(const t of tokens.values()){const px=t.prices.length?t.prices[t.prices.length-1].p:0;for(const w in t.pos){const p=t.pos[w];if(w===t.creator||p.in<=0)continue;const pnl=p.out+p.bal*px-p.in;add(w,{n:1,wins:pnl>0?1:0,pnl,early:p.rank&&p.rank<=10?1:0})}}
+const rows=[];for(const[w,a]of agg)if(a.n>=3&&a.pnl>0&&a.wins/a.n>=0.6)rows.push({w,...a,wr:a.wins/a.n});return rows.sort((x,y)=>y.pnl-x.pnl)}
+setInterval(()=>{const now=Date.now(),out=[];for(const t of tokens.values()){const a=now-t.firstSeen;if(a>KEEP){finish(t);tokens.delete(t.mint)}else if(a<=MAX_AGE)out.push(analyze(t,now))}
 out.sort((a,b)=>b.score-a.score);D={status:stt.status,now,lastMsg:stt.lastMsg,tokens:out};got=Date.now();sseOk=true;render();bar()},1000);
 setInterval(()=>{try{ws&&ws.close()}catch{}},30*60000);
+setInterval(()=>{WB=board();const now=Date.now();for(const[w,a]of wb)if(now-a[0].at>1800000&&!watch.has(w))wb.delete(w)},3000);
 connect();
-const PRE={quick:{score:40,buyers:5,ratio:1,hide:false},strict:{score:70,buyers:10,ratio:1.5,hide:true}};
+const PRE={all:{score:0,buyers:0,ratio:0,hide:false},quick:{score:40,buyers:5,ratio:1,hide:false},strict:{score:70,buyers:10,ratio:1.5,hide:true}};
 function preset(k){const p=PRE[k];$('#score').value=p.score;$('#buyers').value=p.buyers;$('#ratio').value=p.ratio;$('#hide').checked=p.hide;$('#age').value='0-300';$('#net').value=0;$('#top').value=100;down=false;ready=false;render()}
-$('#pQuick').onclick=()=>preset('quick');$('#pStrict').onclick=()=>preset('strict');
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{view=b.dataset.v;down=false;render()});
+$('#detail').addEventListener('click',e=>{const b=e.target.closest('[data-track]');if(b)track(b.dataset.track)});
+$('#pin').addEventListener('click',e=>{const d=e.target.closest('[data-dis]');if(d){dismissed.add(d.dataset.dis);down=false;pin();return}const a=e.target.closest('[data-ack]');if(a){mine[+a.dataset.ack].ack=true;saveMine();down=false;pin()}});
+setInterval(checkMine,1000);
+$('#wAdd').onclick=()=>{const v=$('#wIn').value.trim();if(!MINT_RE.test(v)){$('#wMsg').textContent='That does not look like a Solana wallet address.';return}$('#wMsg').textContent='';$('#wIn').value='';if(!watch.has(v))toggleWatch(v)};
+$('#pAll').onclick=()=>preset('all');$('#pQuick').onclick=()=>preset('quick');$('#pStrict').onclick=()=>preset('strict');
 $('#snd').addEventListener('change',()=>{if($('#snd').checked){ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume();beep()}});
 if(innerWidth<1000)$('details').open=false;
 render();bar();
