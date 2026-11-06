@@ -1,0 +1,184 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PumpVision AI</title>
+<style>
+:root{--bg:#0d0f10;--pn:#16191b;--ln:#262b2f;--tx:#e8ecef;--mu:#8a949c;--gr:#2cff7a;--rd:#ff4d5e;--bl:#3da9ff;--am:#ffb84d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--ln);position:sticky;top:0;background:var(--bg);z-index:5}
+.logo{font-size:17px;letter-spacing:.2px}.logo i{color:var(--gr);font-style:normal}
+.pill{padding:3px 10px;border-radius:99px;border:1px solid;font-size:12px}.ok{color:var(--gr)}.warn{color:var(--am)}.bad{color:var(--rd)}
+.mu{color:var(--mu)}.small{font-size:12px}
+main{display:grid;grid-template-columns:250px minmax(0,1fr) 360px;gap:12px;padding:12px;align-items:start}
+aside{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:12px;position:sticky;top:56px;max-height:calc(100vh - 70px);overflow:auto}
+@media(max-width:1000px){main{grid-template-columns:1fr}aside{position:static;max-height:none}}
+summary{cursor:pointer;font-weight:600;margin-bottom:8px}
+label{display:block;margin:8px 0;color:var(--mu);font-size:12px}label input,label select{display:block;width:100%;margin-top:3px;padding:7px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit}
+label.chk{display:flex;gap:8px;align-items:center;color:var(--tx)}label.chk input{width:auto;margin:0}
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer}.card.sel{border-color:var(--bl)}
+.hd{display:flex;justify-content:space-between;gap:8px}.age{color:var(--bl);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+.score{min-width:38px;text-align:center;padding:3px 8px;border-radius:6px;font-weight:700;color:#06100a}
+.s-strong{background:var(--gr)}.s-prom{background:var(--bl)}.s-watch{background:var(--am)}.s-weak{background:#59626a;color:#fff}
+.risk{padding:2px 8px;border-radius:6px;border:1px solid;font-size:12px}
+.r-LOW{color:var(--gr)}.r-MODERATE{color:var(--am)}.r-HIGH{color:var(--rd)}.r-UNKNOWN{color:var(--mu)}
+.whale{color:var(--bl);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 6px;margin:8px 0 12px}.stats small{display:block;color:var(--mu);font-size:11px}
+.open{display:block;text-align:center;background:var(--gr);color:#04140a;font-weight:800;padding:13px;border-radius:8px;text-decoration:none;font-size:15px}
+.mini{display:flex;gap:8px;margin-top:8px}.mini button,.mini a{flex:1;text-align:center;padding:8px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit;font-size:12px;text-decoration:none;cursor:pointer}
+h3{margin:0 0 8px}.bar{display:flex;justify-content:space-between;font-size:12px;margin-top:6px}.track{height:5px;background:var(--bg);border-radius:3px}.track div{height:5px;background:var(--bl);border-radius:3px}
+.why{margin:6px 0;padding-left:8px;border-left:3px solid var(--am);font-size:13px}.why.confirmed{border-color:var(--rd)}
+.tr{display:flex;justify-content:space-between;font-size:12px;padding:2px 0}.buy{color:var(--gr)}.sell{color:var(--rd)}
+.empty{padding:28px 12px;text-align:center;color:var(--mu)}footer{padding:4px 14px 24px;color:var(--mu);font-size:12px}
+</style></head><body>
+<header><b class="logo">Pump<i>Vision</i> AI</b><span id="st" class="pill"></span><span>New in 5 min: <b id="n1">0</b></span><span>Score 70+: <b id="n2">0</b></span><span class="mu" id="lat"></span></header>
+<main>
+<aside><details open><summary>Filters</summary>
+<label>Token age<select id="age"><option value="0-300">Last 5 minutes</option><option value="0-30">0 to 30 seconds</option><option value="30-60">30 to 60 seconds</option><option value="60-120">1 to 2 minutes</option><option value="120-180">2 to 3 minutes</option><option value="180-300">3 to 5 minutes</option></select></label>
+<label>Minimum score<input id="score" type="number" value="70"></label>
+<label>Minimum unique buyers<input id="buyers" type="number" value="10"></label>
+<label>Minimum buy/sell ratio<input id="ratio" type="number" step="0.1" value="1.5"></label>
+<label>Minimum net SOL in<input id="net" type="number" step="0.5" value="0"></label>
+<label>Max top-holder %<input id="top" type="number" value="100"></label>
+<label class="chk"><input id="hide" type="checkbox" checked> Exclude HIGH risk</label>
+<p class="mu small">Defaults are untested starting assumptions, not proven thresholds. Lower the score and buyer minimums to see more tokens.</p></details></aside>
+<section id="feed"></section>
+<aside id="detail"></aside>
+</main>
+<footer>Scores describe observed early trading activity, not future returns. Unknown data is never treated as safe. Scans only while this page is open. Ages count from first detection in the stream. USD values are unavailable in this version (needs a SOL price feed).</footer>
+<script>
+// Momentum scoring + risk analysis. Pure functions: no network, easy to test.
+const CFG = {
+  weights: { buyPressure: 25, volumeAccel: 20, buyerGrowth: 15, liquidity: 15, holders: 10, price: 10, integrity: 5 },
+  supply: 1e9, liquiditySolFull: 10, topHolderWarn: 0.25, topHolderRisk: 0.4, devWarn: 0.1,
+  whaleSol: 5, minTradesForRating: 8, confirmedPenalty: 15, warningPenalty: 5,
+};
+const c = (x, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, Number.isFinite(x) ? x : 0));
+const label = s => (s >= 85 ? 'Strong momentum signals' : s >= 70 ? 'Promising' : s >= 50 ? 'Watchlist' : 'Weak signals');
+const UNVERIFIED = [
+  'Mint and freeze authority (needs Solana RPC)',
+  'Connected-wallet clusters and bundled launches',
+  'Real liquidity (stream only shows curve state and observed flow)',
+  'Whether any large wallet is profitable or related to another',
+];
+const SNAMES = { buyPressure: 'buy pressure', volumeAccel: 'volume acceleration', buyerGrowth: 'unique buyer growth', liquidity: 'net SOL inflow', holders: 'holder spread', price: 'price momentum', integrity: 'launch integrity' };
+
+function analyze(tok, now = Date.now(), cfg = CFG) {
+  const tr = tok.trades, W = cfg.weights, n = tr.length;
+  const win = (a, b) => tr.filter(t => now - t.t >= a * 1000 && now - t.t < b * 1000);
+  const of = (a, s) => a.filter(t => t.side === s);
+  const sol = a => a.reduce((s, t) => s + t.sol, 0);
+  const uniq = a => new Set(of(a, 'buy').map(t => t.who)).size;
+  const buys = of(tr, 'buy'), sells = of(tr, 'sell');
+  const w10 = win(0, 10), w30 = win(0, 30), w60 = win(0, 60), p30 = win(30, 60), p60 = win(60, 120);
+  const bs60 = sol(of(w60, 'buy')), ss60 = sol(of(w60, 'sell'));
+  const netSol = sol(buys) - sol(sells);
+  const bal = Object.values(tok.balances).sort((a, b) => b - a);
+  const top1 = (bal[0] || 0) / cfg.supply;
+  const devPct = (tok.balances[tok.creator] || 0) / cfg.supply;
+  const devSold = sells.some(t => t.who === tok.creator);
+  const pr = tok.prices, pNow = pr.length ? pr[pr.length - 1].p : null;
+  const at = ms => { let r = null; for (const x of pr) { if (now - x.t >= ms) r = x; else break; } return r || pr[0]; };
+  const chg60 = pr.length > 1 ? pNow / at(60000).p - 1 : 0;
+  const peak = pr.length ? Math.max(...pr.map(x => x.p)) : 0;
+  const dd = peak ? 1 - pNow / peak : 0;
+  const spikeDump = pr.length > 1 && peak / pr[0].p > 2 && dd > 0.4;
+  const amt = {}; tr.forEach(t => { const k = t.sol.toFixed(3); amt[k] = (amt[k] || 0) + 1; });
+  const repeat = n >= 10 && Math.max(...Object.values(amt)) / n >= 0.4;
+  const big = w60.filter(t => t.sol >= cfg.whaleSol);
+
+  const conf = c(n / cfg.minTradesForRating); // thin data earns little credit
+  const comp = {
+    buyPressure: c((bs60 / (bs60 + ss60 || 1) - 0.5) / 0.4) * c(w60.length / 6),
+    volumeAccel: c(((sol(w30) + 0.1) / (sol(p30) + 0.1) - 1) / 2) * c(w30.length / 4),
+    buyerGrowth: 0.5 * c(uniq(w60) / 15) + 0.5 * c((uniq(w60) - uniq(p60)) / 8),
+    liquidity: c(netSol / cfg.liquiditySolFull) * conf,
+    holders: bal.length >= 3 ? (1 - c(top1 / 0.3)) * conf : 0, // unknown is not credited
+    price: c(chg60 / 0.5) * conf,
+    integrity: c(1 - (devPct > cfg.devWarn ? 0.5 : 0) - (devSold ? 1 : 0) - (repeat ? 0.5 : 0)) * conf,
+  };
+
+  const reasons = [], R = (kind, text) => reasons.push({ kind, text });
+  const pc = x => (x * 100).toFixed(0) + '%';
+  if (devSold) R('confirmed', 'Creator wallet sold tokens after launch (seen in stream)');
+  if (top1 >= cfg.topHolderRisk) R('confirmed', `One observed wallet holds ${pc(top1)} of supply`);
+  if (spikeDump) R('confirmed', `Price is ${pc(dd)} below its peak after a spike above 2x`);
+  if (top1 >= cfg.topHolderWarn && top1 < cfg.topHolderRisk) R('warning', `One observed wallet holds ${pc(top1)} of supply`);
+  if (devPct >= cfg.devWarn && !devSold) R('warning', `Creator holds ${pc(devPct)} of supply`);
+  if (repeat) R('warning', 'Many trades share identical SOL amounts (possible scripted activity, unverified)');
+  if (n >= cfg.minTradesForRating && netSol < 1) R('warning', 'Little net SOL has entered the curve (low liquidity proxy)');
+  if (ss60 > bs60 && w60.length >= 6) R('warning', 'Selling outweighs buying over the last 60s');
+  const nc = reasons.filter(r => r.kind === 'confirmed').length, nw = reasons.length - nc;
+
+  const raw = Object.keys(comp).reduce((s, k) => s + comp[k] * W[k], 0) - nc * cfg.confirmedPenalty - nw * cfg.warningPenalty;
+  const score = Math.round(c(raw, 0, 100));
+  const risk = nc ? 'HIGH' : n < cfg.minTradesForRating ? 'UNKNOWN' : nw ? 'MODERATE' : 'LOW';
+  if (risk === 'UNKNOWN') R('warning', `Only ${n} trades observed so far, too few to rate risk`);
+
+  const strong = Object.keys(comp).sort((a, b) => comp[b] - comp[a]).filter(k => comp[k] >= 0.5).slice(0, 2).map(k => SNAMES[k]);
+  const explain = `Momentum score: ${score}/100. ` + (strong.length ? `Strongest signals: ${strong.join(' and ')}. ` : 'No signal is strong yet. ') + (reasons[0] ? `Main concern: ${reasons[0].text}.` : '');
+  const step = Math.max(1, Math.floor(pr.length / 60));
+  const short = w => (w ? w.slice(0, 4) + '…' + w.slice(-4) : '?');
+
+  return {
+    mint: tok.mint, name: tok.name, symbol: tok.symbol, firstSeen: tok.firstSeen,
+    mcSol: tok.mcSol, priceSol: pNow, buys: buys.length, sells: sells.length,
+    ratio: buys.length / Math.max(sells.length, 1), buyers: uniq(tr), volSol: sol(tr), netSol,
+    top1, devPct, tps10: w10.length, chg60, score, label: label(score), risk, reasons, unverified: UNVERIFIED,
+    parts: Object.keys(comp).map(k => ({ k, pts: +(comp[k] * W[k]).toFixed(1), max: W[k] })),
+    explain, whale: big.length ? Math.max(...big.map(t => t.sol)) : 0,
+    series: pr.filter((_, i) => i % step === 0).map(x => x.p),
+    recent: tr.slice(-12).reverse().map(t => ({ ago: now - t.t, side: t.side, sol: t.sol, who: short(t.who) })),
+  };
+}
+
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const NAMES={buyPressure:'Buy pressure',volumeAccel:'Volume acceleration',buyerGrowth:'Unique buyer growth',liquidity:'Net SOL inflow',holders:'Holder spread',price:'Price momentum',integrity:'Launch integrity'};
+let D={tokens:[],status:'connecting',now:0,lastMsg:0},got=0,sel=null,down=false,sseOk=false;
+const F={};function readF(){const[a,b]=$('#age').value.split('-').map(Number);Object.assign(F,{a,b,score:+$('#score').value||0,buyers:+$('#buyers').value||0,ratio:+$('#ratio').value||0,net:+$('#net').value||0,top:+$('#top').value||100,hide:$('#hide').checked})}
+const ageMs=f=>D.now-f+(Date.now()-got),fmt=ms=>{const s=Math.max(0,Math.floor(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const cls=s=>s>=85?'s-strong':s>=70?'s-prom':s>=50?'s-watch':'s-weak';
+const pass=t=>{const a=ageMs(t.firstSeen)/1000;return a>=F.a&&a<F.b+(F.b===300?1:0)&&t.score>=F.score&&t.buyers>=F.buyers&&t.ratio>=F.ratio&&t.netSol>=F.net&&t.top1*100<=F.top&&!(F.hide&&t.risk==='HIGH')};
+function card(t){const n=(v,d=2)=>v==null?'n/a':v.toFixed(d);return`<article class="card${t.mint===sel?' sel':''}" data-m="${t.mint}"><div class="hd"><div><b>${esc(t.name||'Unnamed')}</b> <span class="mu">$${esc(t.symbol)}</span></div><span class="age" data-f="${t.firstSeen}">${fmt(ageMs(t.firstSeen))}</span></div>
+<div class="tags"><span class="score ${cls(t.score)}">${t.score}</span><span class="mu">${esc(t.label)}</span><span class="risk r-${t.risk}">${t.risk} risk</span>${t.whale?`<span class="whale">Whale trade ${t.whale.toFixed(1)} SOL</span>`:''}</div>
+<div class="stats">${[['Mkt cap',n(t.mcSol,1)+' SOL'],['Price',t.priceSol==null?'n/a':t.priceSol.toExponential(2)+' SOL'],['Volume',n(t.volSol)+' SOL'],['Net in',n(t.netSol)+' SOL'],['Buys / sells',t.buys+' / '+t.sells],['Buy:sell',n(t.ratio)],['Buyers',t.buyers],['Top holder',(t.top1*100).toFixed(1)+'%']].map(([k,v])=>`<div><small>${k}</small>${v}</div>`).join('')}</div>
+<a class="open" href="https://pump.fun/coin/${t.mint}" target="_blank" rel="noopener noreferrer">OPEN ON PUMP.FUN</a>
+<div class="mini"><button data-copy="${t.mint}">Copy mint</button><a href="https://dexscreener.com/solana/${t.mint}" target="_blank" rel="noopener noreferrer">DexScreener</a></div></article>`}
+function render(){if(down)return;readF();const l=D.tokens.filter(pass);$('#feed').innerHTML=l.length?l.map(card).join(''):`<div class="empty">${D.status==='live'?`No tokens match your filters yet. ${D.tokens.length} scanned in the last 5 minutes.`:'Waiting for the live stream.'}</div>`;$('#n1').textContent=D.tokens.length;$('#n2').textContent=D.tokens.filter(t=>t.score>=70).length;detail()}
+function detail(){const t=D.tokens.find(x=>x.mint===sel),el=$('#detail');
+if(!sel){el.innerHTML='<h3>Token details</h3><p class="mu">Select a token to see its score breakdown, risk reasons and recent trades.</p>';return}
+if(!t){el.innerHTML='<h3>Token details</h3><p class="mu">This token is older than 5 minutes and has left the scanner.</p>';return}
+const s=t.series,mn=Math.min(...s),mx=Math.max(...s),pts=s.length>1?s.map((p,i)=>`${i/(s.length-1)*300},${68-(mx>mn?(p-mn)/(mx-mn)*64:32)}`).join(' '):'';
+el.innerHTML=`<h3>${esc(t.name)} <span class="mu">$${esc(t.symbol)}</span></h3><svg viewBox="0 0 300 70" width="100%" height="70" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="var(--gr)" stroke-width="1.5"/></svg><p class="mu small">Price on the bonding curve since first detection.</p>
+<p>${esc(t.explain)}</p>${t.parts.map(p=>`<div class="bar"><span>${NAMES[p.k]}</span><span>${p.pts}/${p.max}</span></div><div class="track"><div style="width:${p.pts/p.max*100}%"></div></div>`).join('')}
+<h3 style="margin-top:14px">Risk: <span class="r-${t.risk}">${t.risk}</span></h3>${t.reasons.length?t.reasons.map(r=>`<div class="why ${r.kind}"><b>${r.kind==='confirmed'?'Observed risk':'Warning'}:</b> ${esc(r.text)}</div>`).join(''):'<p class="mu small">No red flags in the data available.</p>'}
+<p class="mu small">Not checked in this version: ${t.unverified.map(esc).join('; ')}. Unchecked is not the same as safe.</p>
+<h3 style="margin-top:14px">Recent trades</h3>${t.recent.map(r=>`<div class="tr"><span class="${r.side}">${r.side}</span><span>${r.sol.toFixed(2)} SOL</span><span class="mu">${esc(r.who)}</span><span class="mu">${Math.round(r.ago/1000)}s ago</span></div>`).join('')||'<p class="mu small">No trades yet.</p>'}`}
+function bar(){const stale=Date.now()-got,q=(D.now-D.lastMsg+stale)/1000;let c,m;
+if(!sseOk||stale>4000)[c,m]=['bad','Page paused'];else if(D.status!=='live')[c,m]=['bad','Stream disconnected'];else if(!D.lastMsg||q>20)[c,m]=['warn','Stream quiet'];else[c,m]=['ok','Live'];
+$('#st').className='pill '+c;$('#st').textContent=m;$('#lat').textContent=D.lastMsg?`Last stream message ${Math.round(q)}s ago`:''}
+$('#feed').addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(b){navigator.clipboard.writeText(b.dataset.copy).then(()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy mint',1200)}).catch(()=>{b.textContent='Copy failed'});return}
+if(e.target.closest('a'))return;const c=e.target.closest('.card');if(c){sel=c.dataset.m;down=false;render();if(innerWidth<1000)$('#detail').scrollIntoView({behavior:'smooth'})}});
+document.querySelectorAll('aside input,aside select').forEach(i=>i.addEventListener('input',render));
+addEventListener('pointerdown',()=>down=true);['pointerup','pointercancel'].forEach(ev=>addEventListener(ev,()=>setTimeout(()=>down=false,60)));
+setInterval(()=>{document.querySelectorAll('.age').forEach(a=>a.textContent=fmt(ageMs(+a.dataset.f)));bar()},1000);
+// ---- live engine: runs entirely in this page ----
+const WS_URL='wss://pumpportal.fun/api/data',MAX_AGE=300000,KEEP=600000,MINT_RE=/^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+const tokens=new Map(),stt={status:'connecting',lastMsg:0};let ws,attempt=0;
+const wsend=o=>ws&&ws.readyState===1&&ws.send(JSON.stringify(o));
+function connect(){ws=new WebSocket(WS_URL);
+ws.onopen=()=>{attempt=0;stt.status='live';wsend({method:'subscribeNewToken'});const k=[...tokens.values()].filter(t=>Date.now()-t.firstSeen<MAX_AGE).map(t=>t.mint);if(k.length)wsend({method:'subscribeTokenTrade',keys:k})};
+ws.onmessage=e=>{stt.lastMsg=Date.now();let m;try{m=JSON.parse(e.data)}catch{return}handle(m)};
+ws.onclose=()=>{stt.status='disconnected';setTimeout(connect,Math.min(30000,1000*2**attempt++)+Math.random()*500)};
+ws.onerror=()=>{}}
+function handle(m){if(!m||typeof m.mint!=='string'||!MINT_RE.test(m.mint))return;const now=Date.now();
+if(m.txType==='create'){if(tokens.has(m.mint))return;const t={mint:m.mint,name:String(m.name||'').slice(0,40),symbol:String(m.symbol||'').slice(0,12),creator:m.traderPublicKey,firstSeen:now,trades:[],balances:{},prices:[],mcSol:null};
+tokens.set(m.mint,t);wsend({method:'subscribeTokenTrade',keys:[m.mint]});push(t,{...m,txType:'buy',newTokenBalance:m.initialBuy},now,Number(m.solAmount)>0)}
+else if(m.txType==='buy'||m.txType==='sell'){const t=tokens.get(m.mint);if(t)push(t,m,now,true)}}
+function push(t,m,now,isTrade){if(isTrade){t.trades.push({t:now,side:m.txType,sol:Number(m.solAmount)||0,who:m.traderPublicKey});if(t.trades.length>3000)t.trades.shift()}
+if(m.traderPublicKey&&m.newTokenBalance!=null)t.balances[m.traderPublicKey]=Number(m.newTokenBalance)||0;
+const vs=Number(m.vSolInBondingCurve),vt=Number(m.vTokensInBondingCurve);if(vs>0&&vt>0){t.prices.push({t:now,p:vs/vt});if(t.prices.length>600)t.prices.shift()}
+if(m.marketCapSol!=null)t.mcSol=Number(m.marketCapSol)}
+setInterval(()=>{const now=Date.now(),out=[];for(const t of tokens.values()){const a=now-t.firstSeen;if(a>KEEP)tokens.delete(t.mint);else if(a<=MAX_AGE)out.push(analyze(t,now))}
+out.sort((a,b)=>b.score-a.score);D={status:stt.status,now,lastMsg:stt.lastMsg,tokens:out};got=Date.now();sseOk=true;render();bar()},1000);
+setInterval(()=>{try{ws&&ws.close()}catch{}},30*60000);
+connect();
+render();bar();
+</script></body></html>
